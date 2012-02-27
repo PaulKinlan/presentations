@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<!--
+Copyright 2011 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Author: Eric Bidelman (ericbidelman@chromium.org)
+-->
+<html>
+<head>
+  <title>Accessible Web Apps</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <script src='slides.js'></script>
+  <script src="events.js"></script>
+      <script>
+      var slides;
+      var showAllSlidesButton;
+      var ignoreFocusEvents = false;
+      var currentStars = 3;
+
+      function $(element) {
+        return document.getElementById(element);
+      }
+
+      // This presentation shows only a few slides at a time. This works in
+      // most screen readers too, but for those where it doesn't, here's a
+      // way to just show all slides. -->
+      function showAllSlides() {
+        console.log('showAllSlides');
+        document.body.classList.add('showAllSlides');
+        showAllSlidesButton.parentElement.removeChild(showAllSlidesButton);
+      }
+      function updateShowAllSlidesButton() {
+        if (!showAllSlidesButton) {
+          return;
+        }
+
+        var slideNo = parseInt(location.hash.substr(1), 10);
+        var first = Math.max(slideNo - 2, 1);
+        var last = Math.min(slideNo + 2, slides.length);
+        showAllSlidesButton.innerText =
+            'Showing slides ' + first + ' - ' + last + ' of ' +
+            slides.length + '. Click to show all slides.';
+      }
+
+      function onSlideEnter() {
+        console.log('onSlideEnter');
+        updateShowAllSlidesButton();
+        window.setTimeout(function() {
+          document.activeElement.blur();
+          window.setTimeout(function() {
+            var slideIndex = parseInt(location.hash.substr(1), 10) - 1;
+            ignoreFocusEvents = true;
+            slides[slideIndex].focus();
+            console.log('onSlideEnter focus');
+            window.setTimeout(function() {
+              ignoreFocusEvents = false;
+            }, 0);
+          }, 600);
+        }, 600);
+      }
+
+      function onFocus(e) {
+        console.log('focus ' + e.target);
+        document.pageXOffset = 0;
+        if (ignoreFocusEvents) {
+          console.log('ignore focus');
+          return true;
+        }
+        var t = e.target;
+        while (t && t.tagName != 'ARTICLE') {
+          t = t.parentElement;
+        }
+        if (t) {
+          var slideIndex = parseInt(t.getAttribute('slideIndex'), 10);
+          if (curSlide != slideIndex) {
+            console.log('Focus switch from ' +
+                        (curSlide + 1) + ' to ' + (slideIndex + 1));
+            curSlide = slideIndex;
+            updateSlides();
+            document.body.scrollLeft = 0;
+          }
+        }
+        return true;
+      }
+
+      function onScroll(e) {
+        console.log('scroll');
+        document.body.scrollLeft = 0;
+        e.preventDefault();
+        return false;
+      }
+
+      // Called when the page loads.
+      function initAriaPreso() {
+        slides = document.querySelectorAll('section.slides > article');
+        showAllSlidesButton = $('showAllSlidesButton');
+
+        for (var i = 0; i < slides.length; i++) {
+          slides[i].setAttribute('tabindex', '-1');
+          slides[i].setAttribute('slideIndex', i);
+          slides[i].setAttribute('title', 'Slide ' + (i + 1));
+        }
+
+        document.addEventListener('slideenter', onSlideEnter, true);
+        document.addEventListener('focus', onFocus, true);
+        document.addEventListener('scroll', onScroll, true);
+        window.setTimeout(function() {
+          updateShowAllSlidesButton();
+        }, 0);
+      }
+
+      // Star rating gadget
+
+      var starNames = {
+        0: 'No stars',
+        1: '1 star',
+        2: '2 stars',
+        3: '3 stars',
+        4: '4 stars',
+        5: '5 stars'
+      };
+
+      function setstars(stars) {
+        var elems = $('stars').children;
+        currentStars = stars;
+        for (var i = 1; i <= 5; i++) {
+          var elem = elems[i];
+          if (stars >= i) {
+            elem.className = 'star_full';
+          } else {
+            elem.className = 'star_empty';
+          }
+        }
+        var cancel = elems[0];
+        if (stars > 0) {
+          cancel.style.visibility = 'visible';
+        } else {
+          cancel.style.visibility = 'hidden';
+        }
+        var caption = elems[6];
+        caption.innerText = starNames[stars];
+        var stars_elem = $('stars');
+        stars_elem.setAttribute('aria-valuenow', stars);
+        stars_elem.setAttribute('aria-valuetext', starNames[stars]);
+      }
+
+      function starkey(event) {
+        if (event.keyCode == 37) {
+          if (currentStars > 0) {
+            setstars(currentStars - 1);
+          }
+          event.stopPropagation();
+        } else if (event.keyCode == 39) {
+          if (currentStars < 5) {
+            setstars(currentStars + 1);
+          }
+          event.stopPropagation();
+        }
+        return false;
+      }
+
+      function initstar(stars, star) {
+        var elem = stars.children[star];
+        elem.addEventListener('click', function() {
+          setstars(star);
+        }, false);
+      }
+
+      function initstars() {
+        var stars = $('stars');
+        for (var i = 0; i <= 5; i++) {
+          initstar(stars, i);
+        }
+      }
+
+      function refreshLiveCoding(e, basename) {
+        var src = $(basename + '_src');
+        var dst = $(basename + '_embed');
+        var html = src.innerText;
+        var scripts = /<script>([^<]*)<\/script>/i.exec(html);
+        console.log('scripts: ' + scripts);
+        if (scripts) {
+          var scriptCode = scripts[1];
+          html = html.replace(/<script>[^<]*<\/script>/, '');
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.innerText = scriptCode;
+          document.body.appendChild(script);
+        }
+        dst.innerHTML = html;
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        try {
+          initstars();
+        } catch(e) {}
+        return false;
+      }
+
+      // Sync a contenteditable containing html with a div containing the result.
+      function manageLiveCoding(basename) {
+        var src = $(basename + '_src');
+        refreshLiveCoding(null, basename);
+        src.addEventListener('keydown', function(e) {
+          if (e.keyCode == 9)  // tab
+            return true;
+          window.setTimeout(function() {
+            refreshLiveCoding(null, basename);
+          }, 0);
+          e.stopPropagation();
+          return false;
+        }, false);
+        src.addEventListener('blur', function(e) {
+          window.setTimeout(function() {
+            prettyPrint();
+          }, 0);
+        }, false);
+      }
+
+      // Generic onKeyDown handler for anything clickable.
+      function onKeyDown(e) {
+        if (e.keyCode == 32 || e.keyCode == 13) {
+          prettyPrint();
+          var evt = document.createEvent('MouseEvents');
+          evt.initMouseEvent('click', true, true, document.defaultView,
+            1, 0, 0, 0, 0, false, false, false, false, 0, null);
+          try {
+            e.target.dispatchEvent(evt);
+          } catch (e) {}
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
+        }
+        return true;
+      }
+
+      // Override keys used by interactive controls so they don't move
+      // to the next slide.
+      function overrideKeys(e) {
+        if (e.keyCode == 32 ||  // space
+            e.keyCode == 13 ||  // return
+            e.keyCode == 8 ||   // tab
+            e.keyCode == 38 ||  // up-arrow
+            e.keyCode == 40) {  // down-arrow
+          e.stopPropagation();
+        }
+        return true;
+      }
+    </script>
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|Droid+Sans+Mono&v2">
+</head>
+  <style>
+    #showAllSlidesButton {
+      position: absolute;
+      left: -9999px;
+      overflow: hidden;
+    }
+
+    article:focus {
+      outline: none;
+    }
+    
+    *:focus { 
+    outline: auto 10px purple; 
+    outline-offset: 5px; 
+    }
+
+    .slides > article {
+      -webkit-transition: -webkit-transform .4s ease-out !important;
+    }
+
+    body.showAllSlides {
+      height: auto !important;
+      overflow: scroll !important;
+    }
+
+    body.showAllSlides .slides > article {
+      position: static !important;
+      -webkit-transform: translate3d(0, 0, 0) !important;
+      margin-left: 0px;
+      margin-top: 0px;
+      display: block !important;
+    }
+
+    .magnified {
+      border: 2px solid #696969;
+      padding: 0.1em 0.2em 0.1em 0.2em;
+      font-size: 160%;
+      position: relative;
+      top: 0.15em;
+    }
+
+    iframe {
+      height: 520px !important;
+    }
+
+    h3 + iframe {
+      height: 440px !important;
+    }
+
+    .parenthetical {
+      margin: 0 0.5em 0 0.5em;
+      color: #aaa;
+    }
+
+    .bottomhalf_src {
+      font-family: 'Droid Sans Mono', 'Courier New', monospace;
+
+      font-size: 20px;
+      line-height: 30px;
+      padding: 10px 15px;
+
+      color: black;
+      background: rgb(240, 240, 240);
+      overflow: auto;
+    }
+
+    div.tophalf_embed {
+      margin: 16px 20px 0px 0px;
+      padding: 5px 10px;
+
+      border: 1px solid #696969;
+      overflow: hidden;
+    }
+
+    .lefthalf_src {
+      margin: 16px 20px 20px 0px;
+      float: left;
+      width: 380px;
+      height: 440px;
+
+      font-family: 'Droid Sans Mono', 'Courier New', monospace;
+
+      font-size: 15px;
+      line-height: 24px;
+      padding: 5px 10px;
+
+      color: black;
+      background: rgb(240, 240, 240);
+      overflow: auto;
+    }
+
+    div.righthalf_embed {
+      margin: 16px 20px 0px 0px;
+      padding: 5px 10px;
+      float: left;
+      width: 300px;
+      height: 404px;
+      border: 1px solid #696969;
+      overflow: hidden;
+    }
+
+    button.refresh {
+      cursor: pointer;
+      margin: 0px;
+      padding: 0px;
+      font-size: 12px;
+      background: none;
+      border: 0px;
+      text-decoration: underline;
+      color: #00f;
+    }
+
+    .star_rating {
+      display: inline-block;
+      padding: 2px;
+      height: 24px;
+    }
+
+    .star_cancel {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: url(images/star_cancel.gif);
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .star_full {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: url(images/star1.gif);
+    }
+
+    .star_empty {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: url(images/star0.gif);
+    }
+
+    .star_caption {
+      margin-left: 1em;
+      display: inline-block;
+      width: 4em;
+      color: #696969;
+      font-size: 20px;
+    }
+  </style>
+<body style="display: none">
+
+<section class='slides layout-regular'>
+
+  <!--<article class='biglogo'></article>-->
+
+  <article id="title">
+    <div>
+      <p>Paul Kinlan<br>
+      Google Developer Day 2011<br>
+      </p>
+      <h1>Making Your Web Apps Accessible Using HTML5 and ChromeVox</h1>
+    </div>
+  </article>
+
+      <article>
+        <h2>
+          Case Study: Add to Circles Widget
+        </h2>
+
+      </article>
+
+  <article>
+    <h3>Accessibility on the Web</h3>
+    <ul>
+      <li>Accessibility = making your web apps usable by everyone.</li>
+      <li>This includes users of assistive technology.</li>
+      <ul>
+        <li>Assistive technology is software or hardware that<br>
+        makes it easier for someone with a disability to use <br>
+        the Internet.</li>
+      </ul>
+    </ul>
+  </article>
+
+  <article>
+    <h2>Also known as "a11y"</h2>
+  </article>
+  
+  <article>
+        <style>
+          .braille_item {
+            background-image: url(images/braille.jpg);
+            background-repeat:no-repeat;
+            background-position:right top;
+          }
+          .headphones_item {
+            background-image: url(images/headphones.jpg);
+            background-repeat:no-repeat;
+            background-position:right top;
+          }
+        </style>
+
+        <h3>
+          Target audience:<br>
+          Users with assistive technology
+        </h3>
+        <ul>
+          <li class="braille_item" tabindex='0'>
+            <b>Blind users</b><br>
+            with a <b>screen reader</b> that describes<br>
+            the page using synthesized speech <br>
+            or braille output.
+
+          <li tabindex='0'>
+            <b>Low-vision users</b><br>
+            who use large fonts or a screen
+            <span class="magnified">magnifier.</span>
+
+          <li class="headphones_item">
+            <b>Motor-impaired users</b><br>
+            who can’t use a mouse and may use<br>
+            a special keyboard or voice-control interface.
+        </ul>
+
+      </article>
+      
+      <article>
+
+          <h3>
+            Introducing ChromeVox
+          </h3>
+
+          <ul>
+            <li>My team at Google has built a screen reader<br>
+            called <b>ChromeVox</b>.
+            <li>ChromeVox is a screen reader designed for the web.</li>
+            <ul>
+              <li>You control it using keyboard shortcuts.
+              <li>It speaks the contents of a webpage using the Chrome Text-To-Speech API.
+            </ul>
+          </ul>
+          </p>
+
+      </article>
+      
+       <article>
+
+        <style>
+          input {
+            margin-left: 0.5em;
+            font-size: 100%;
+          }
+          select {
+            margin-left: 0.5em;
+            font-size: 100%;
+            vertical-align: middle;
+          }
+        </style>
+
+        <h3>
+          Screen reader introduction
+        </h3>
+
+        <p>Screen readers and magnifiers allow the user to explore
+           both static text and interactive elements.</p>
+
+        <p>Here's an example web form to demonstrate:</p>
+
+        <form style="border: 1px solid #696969; padding: 1em; margin-top: 1em;">
+
+          <p>
+            <label for="username">Enter your name:</label>
+            <input type="text" id="username" />
+          </p>
+
+          <p>
+            <label for="colorchoice">Choose your favorite color:</label>
+            <select id="colorchoice">
+              <option selected>Red</option>
+              <option>Orange</option>
+              <option>Yellow</option>
+              <option>Green</option>
+              <option>Blue</option>
+              <option>Purple</option>
+              <option>Brown</option>
+              <option>Black</option>
+              <option>Gray</option>
+              <option>White</option>
+            </select>
+          </p>
+          
+          <p>
+            <input type="submit" style="width: 10em;" />
+          </p>
+
+          <p>Having trouble?
+             <a href="http://www.google.com/">Click here for help</a>
+          </p>
+
+        </form>
+
+      </article>
+
+      <article>
+        <h2>
+          Overview
+        </h2>
+        <ol style="list-style-type:upper-roman; font-size: 120%;">
+          <li>Building blocks of accessible Web Apps
+          <li>Next steps: custom interactive controls
+          <li>Tools & Resources
+        </ol>
+
+      </article>
+      
+  <article>
+    <h2>Building Blocks</h2>
+  </article>
+
+  <article>
+    <h3>Starting from Scratch - the DOM</h3>
+    <ul>
+      <li>Visually impaired users see only the DOM.
+      <li>Keyboard-only users navigate the page in DOM order.
+      <li>So the DOM is the user's mental image of the <br>
+      document structure:
+      <ul>
+        <li>No left or right, only up and down the DOM.
+      </ul>
+    </ul>
+  </article>
+
+  <article>
+    <h3>DOM Best Practices</h3>
+    <ul>
+      <li>Create logical sections of the document to help identify interface elements that are related.
+      <ul>
+      <li>HTML5 semantic elements like <code>&lt;nav&gt;</code>, <code>&lt;header&gt;</code>, and
+      <code>&lt;h1&gt;</code> are useful here.
+      </ul>
+      <li>Make sure parts of controls are grouped together<br>
+      in the DOM.
+      <ul>
+        <li>For example, the drop-down menu button and the drop-down menu itself.
+      </ul>
+      <li>Use CSS for layout instead of tables.
+    </ul>
+  </article>
+
+  <article>
+        <style>
+          #plain {
+            position: relative;
+             left: 430px;
+          }
+          #rain {
+            position: relative;
+             left: -100px;
+          }
+          #Spain {
+            position: relative;
+            left: -320px;
+          }
+          #stays {
+            position: relative;
+            left: 13px;
+          }
+          #in1 {
+            position: relative;
+            left: -10px;
+          }
+        </style>
+
+    <h3>Example</h3>
+    <blockquote id="quote">The <span id="plain">plain </span><span id="in1">in </span>
+    <span id="rain">rain </span><span id="stays">stays mainly in the </span>
+    <span id="Spain">Spain </span></blockquote>
+    <section class="build">
+        <pre>
+    &lt;blockquote&gt;
+    The &lt;span&gt;plain&lt;/span&gt;&lt;span&gt;in&lt;/span&gt;&lt;span&gt;rain&lt;/span&gt;
+    &lt;span&gt;stays mainly in the &lt;/span&gt;&lt;span&gt;Spain&lt;/span&gt;
+    &lt;/blockquote&gt;
+</pre>
+    </section>
+  </article>
+
+  <article>
+    <h3>Interactive Controls</h3>
+    <ul>
+      <li>Use native HTML tags instead of generic divs or spans.
+      <ul>
+        <li>In other words, no Div Soup! No Span Salad!
+      </ul>
+<pre style="margin-top: 1em">&lt;span onclick=""&gt;...  &rArr;  &lt;a href=""&gt;...
+&lt;div onclick=""&gt;...   &rArr;  &lt;button onclick=""&gt;...</pre>
+    <li>Why?
+    <ul>
+    <li>Screen readers can't identify generic divs or spans<br>
+    as controls.
+    <li>Generic divs or spans aren't focusable, so they can't be activated with the keyboard.
+    </ul>
+    </ul>
+  </article>
+
+  <article>
+    <h3>Interactive Controls</h3>
+    <ul>
+      <li>For modern browsers, there is NO reason not to use native HTML tags.
+      <ul>
+        <li>You can style them however you want.
+        <li>They give you focus management and keyboard support for free! Screen readers know how to identify them, users know how to use them.
+      </ul>
+    </ul>
+  </article>
+  
+
+  <article>
+        <style>
+          .custombutton {
+            cursor: pointer;
+            border: 1px solid #000;
+            margin: 10px;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 0px;
+            background: -webkit-gradient(
+                linear, left top, left bottom, from(#fff), to(#ccc));
+        	font-weight: normal;
+            font-size: 30px;
+            color: #545454 !important;
+            font-family: 'Open Sans', Arial, sans-serif !important;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+            line-height: 36px !important;
+            letter-spacing: -1px !important;
+          }
+        </style>
+
+        <h3>
+          Custom button - Live Coding Example
+        </h3>
+
+        <div id="custombutton_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'custombutton')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+
+        <pre id="custombutton_src" class="bottomhalf_src" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true">
+&lt;div&gt;Click on this button:
+&lt;div class="custombutton" onclick="alert('sent!')"&gt;Send&lt;/div&gt;&lt;/div&gt;</pre>
+
+        <script>
+          manageLiveCoding('custombutton');
+        </script>
+      </article>
+  
+  <article>
+        <style>
+          .custombutton {
+            cursor: pointer;
+            border: 1px solid #000;
+            margin: 10px;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 0px;
+            background: -webkit-gradient(
+                linear, left top, left bottom, from(#fff), to(#ccc));
+        	font-weight: normal;
+            font-size: 30px;
+            color: #545454 !important;
+            font-family: 'Open Sans', Arial, sans-serif !important;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+            line-height: 36px !important;
+            letter-spacing: -1px !important;
+          }
+        </style>
+
+        <h3>
+          Custom button - Correct Example
+        </h3>
+
+        <div id="custombutton_correct_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'custombutton_correct')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+
+        <pre id="custombutton_correct_src" class="bottomhalf_src" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true">
+&lt;div&gt;Click on this button:
+&lt;button class="custombutton" onclick="alert('sent!')"&gt;Send&lt;/button&gt;&lt;/div&gt;</pre>
+
+        <script>
+          manageLiveCoding('custombutton_correct');
+        </script>
+      </article>
+
+  <article>
+    <h3>Labeling - Label Your Controls and Images!</h3>
+    <ul>
+      <li><code>&lt;label&gt;</code> is perfect for form elements. 
+<pre>&lt;label for="firstname"&gt;First name:&lt;/label&gt;
+&lt;input type="text" id="firstname"/&gt;</pre>
+      <li>All images should have the <code>alt</code> attribute:
+      <ul>
+        <li>Important images should have descriptive <code>alt</code> text.      
+          <pre>&lt;img src="chart.png" alt="[description]"&gt;</pre>
+        <li>Decorative images should have blank <coede>alt</code> text.
+<pre>&lt;img src="bullet35648.gif" alt=""&gt;</pre>
+    </ul>
+    </ul>
+  </article>
+  
+  <article>
+        <style>
+        #user {
+        width: 250px;
+        }
+        #password {
+        width: 250px;
+        }
+        .label_left {
+          font-size: 25px;
+          margin-left: 16px;
+        }
+        .label_right {
+          font-size: 25px;
+          margin-left: 149px;
+        }
+        </style>
+
+        <h3>
+          Labeling - Live Coding Example
+        </h3>
+
+        <div id="labeling_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'labeling')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+
+        <pre id="labeling_src" class="bottomhalf_src" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true">
+&lt;input type="text" id="user"&gt;
+&lt;input type="password" id="password"&gt;
+&lt;img src="images/901d3n94t3.jpg" /&gt;
+&lt;br&gt;
+&lt;span class="label_left"&gt;User Name&lt;/span&gt;
+&lt;span class="label_right"&gt;PIN&lt;/span&gt;
+&lt;br&gt;&lt;button&gt;Send&lt;/button&gt;
+</pre>
+
+        <script>
+          manageLiveCoding('labeling');
+        </script>
+      </article>
+  
+  <article>
+    <style>
+        #user_correct {
+        width: 250px;
+        }
+        #password_correct {
+        width: 250px;
+        }
+    </style>
+        <h3>
+          Labeling - Correct Example
+        </h3>
+
+        <div id="labeling_correct_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'labeling_correct')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+
+        <pre id="labeling_correct_src" class="bottomhalf_src" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true">
+&lt;input type="text" id="user_correct"&gt;
+&lt;input type="password" id="password_correct"&gt;
+&lt;img src="images/901d3n94t3.jpg" alt="Bridge Security Image"/&gt;
+&lt;br&gt;
+&lt;label for="user_correct" class="label_left"&gt;User Name&lt;/label&gt;
+&lt;label for="password_correct" class="label_right"&gt;PIN&lt;/label&gt;
+&lt;br&gt;&lt;button&gt;Send&lt;/button&gt;
+</pre>
+
+        <script>
+          manageLiveCoding('labeling_correct');
+        </script>
+      </article>
+
+  <article>
+    <h3>Manage focus.</h3>
+    <ul>
+      <li>Keyboard-only users navigate by moving focus through the DOM.
+      <li>So we should proactively place focus with element.focus() to create an efficient workflow.
+      <li>When changing tabs, navigating to an overlay, etc - put focus in an appropriate element in the new view.  When that view is closed, return focus to where it was.
+    </ul>
+  </article>
+
+      <article id="dialog_live">
+
+        <h3>
+          Pop-up dialog - Live Coding Example
+        </h3>
+
+        <style>
+          .dialog {
+            display: none;
+            border: 1px solid #000;
+            border-radius: 10px;
+            margin: 15px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 6px 6px 8px #696969;
+            position: absolute;
+          }
+          .dialog p {
+            font-size: 18px;
+          }
+          .copypasta {
+            vertical-align: middle;
+            margin-left: 20px;
+            height: 16px;
+          }
+        </style>
+
+        <div id="dialog_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'dialog')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+        
+        
+
+        <pre id="dialog_src" class="bottomhalf_src smaller" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true" style="height: 360px">
+&lt;script&gt;
+function confirm() {
+  $('ink_dialog').style.display = 'block';
+  $('dialog_live').style.backgroundColor = 'gray';
+}
+function closeDialog() {
+  $('ink_dialog').style.display = 'none';
+  $('dialog_live').style.backgroundColor = 'white';
+}
+&lt;/script&gt;
+
+&lt;div id="ink_dialog" class="dialog"&gt;
+  &lt;p&gt;Are you sure you can afford it?&lt;/p&gt;
+  &lt;button id="ok" onclick="closeDialog()"&gt;OK&lt;/button&gt;
+  &lt;button id="cancel" onclick="closeDialog()"&gt;Cancel&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;button id="confirm" onclick="confirm()"&gt;
+  Buy More Printer Ink
+&lt;/button&gt;</pre>
+
+<textarea class="copypasta">var lastFocus = $('ok');
+  var listener = function(e) {
+    window.setTimeout(function() {
+      if (e.target != $('ok') &&
+          e.target != $('cancel')) {
+        lastFocus.focus();
+      } else {
+        lastFocus = e.target;
+      }
+    }, 0);
+  };
+  document.addEventListener(
+      'focus', listener, true);
+  $('ok').addEventListener(
+      'click', function(e) {
+        $('ink_dialog').style.display = 'none';
+        document.removeEventListener(
+            'focus', listener, true);
+      }, false);
+  $('cancel').addEventListener(
+      'click', function(e) {
+        $('ink_dialog').style.display = 'none';
+        document.removeEventListener(
+            'focus', listener, true);
+      }, false);
+</textarea>
+
+        <script>
+          manageLiveCoding('dialog');
+        </script>
+
+      </article>
+
+      <article id="dialog_correct">
+
+        <h3>
+          Pop-up dialog - Correct Example
+        </h3>
+
+        <style>
+          .dialog {
+            display: none;
+            border: 1px solid #000;
+            border-radius: 10px;
+            margin: 15px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 6px 6px 8px #696969;
+            position: absolute;
+          }
+          .dialog p {
+            font-size: 18px;
+          }
+          .copypasta {
+            vertical-align: middle;
+            margin-left: 20px;
+            height: 16px;
+          }
+        </style>
+
+        <div id="dialog_correct_embed" class="tophalf_embed"></div>
+        <button class="refresh"
+                onclick="return refreshLiveCoding(event, 'dialog_correct')"
+                onkeydown="return onKeyDown(event)">
+          Refresh
+        </button>
+        
+        
+
+        <pre id="dialog_correct_src" class="bottomhalf_src smaller" tabindex="0"
+             contenteditable="true" spellcheck="false" aria-hidden="true" style="height: 360px">
+&lt;script&gt;
+function confirm_correct() {
+  $('ink_dialog_correct').style.display = 'block';
+  $('ok_correct').focus();  
+  $('dialog_correct').style.backgroundColor = 'gray';
+  
+  var lastFocus = $('ok_correct');
+  var listener = function(e) {
+    window.setTimeout(function() {
+      if (e.target != $('ok_correct') && e.target != $('cancel_correct'))
+      {
+        lastFocus.focus();
+      } else {
+        lastFocus = e.target;
+      }
+    }, 0);
+  };
+  document.addEventListener('focus', listener, true);
+  $('ok_correct').addEventListener('click', function(e) {
+      $('ink_dialog_correct').style.display = 'none';
+      $('dialog_correct').style.backgroundColor = 'white';
+      document.removeEventListener('focus', listener, true);
+      $('confirm_correct').focus();
+    }, false);
+    
+  $('cancel_correct').addEventListener('click', function(e) {
+      $('ink_dialog_correct').style.display = 'none';
+      $('dialog_correct').style.backgroundColor = 'white';
+      document.removeEventListener('focus', listener, true);
+      $('confirm_correct').focus();
+    }, false);
+}
+
+&lt;/script&gt;
+
+&lt;div id="ink_dialog_correct" class="dialog" role="dialog"&gt;
+  &lt;p&gt;Are you sure you can afford it?&lt;/p&gt;
+  &lt;button id="ok_correct"&gt;OK&lt;/button&gt;
+  &lt;button id="cancel_correct"&gt;Cancel&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;button id="confirm_correct" onclick="confirm_correct()"&gt;
+  Buy More Printer Ink
+&lt;/button&gt;</pre>
+
+        <script>
+          manageLiveCoding('dialog_correct');
+        </script>
+
+      </article>
+      
+<article>
+    <h3>Keyboard Shortcuts</h3>
+    <ul>
+      <li><strong>Navigation Shortcuts</strong> jump between major<br>
+      interactive areas.
+      <ul>
+        <li>Prevent excessive tabbing
+        <li>Segment UI into logical units
+      </ul>
+      <li><strong>Action Shortcuts</strong > enable complex actions with a<br>
+      few keystrokes.
+      <ul>
+      <li>Simplifies workflows
+       </ul>
+      <li><strong>All shortcuts</strong> need to be well-documented to<br>
+      ensure discoverability.
+    </ul>
+  </article>
+
+<article>
+  <h2>
+    Next Steps
+  </h2>
+</article>
+  
+  <article>
+    <h3>Working with Custom Interactive Controls</h3>
+    <ul>
+      <li>We have <code>div</code> soup. Now what?
+      <li>We should re-implement all the semantics of a native control on the custom control!
+      <ul>
+        <li>Focus management
+        <li>Keyboard support
+      </ul>
+      <li>We also need to add ARIA roles and states for<br>
+      screen readers.
+    </ul>
+  </article>
+  
+  <article>
+  <style>
+    .addtocircles_imgs {
+      position: relative;
+      margin-left: auto;
+      margin-right: auto;
+      width: 405px;
+      height: 125px;
+      margin-top: 15px;
+      margin-bottom: -20px;
+    }
+  </style>
+    <h3>Div Soup</h3>
+    <div class="addtocircles_imgs">
+    <img src="images/addtocircles_widget.jpg" alt="Add To Circles Image" />
+    <img src="images/addtocircles_dropdown.jpg" alt="Add To Circles Image" />
+    </div>
+    <br>
+    <pre style="margin-top: 1em;">
+&lt;div class="addToCircles_widget"&gt;
+  &lt;span class="label"&gt;Add to circles&lt;/span&gt;
+&lt;/div&gt;
+&lt;!-- The entire rest of the DOM is here --&gt;
+&lt;div class="addToCircles_dropdown"&gt;
+    &lt;div&gt;1&lt;/div&gt;&lt;div class="check"&gt;&lt;/div&gt;&lt;span&gt;Friends&lt;/span&gt;
+    &lt;div&gt;2&lt;/div&gt;&lt;div class="check"&gt;&lt;/div&gt;&lt;span&gt;Family&lt;/span&gt;
+    &lt;div&gt;0&lt;/div&gt;&lt;div class="check"&gt;&lt;/div&gt;&lt;span&gt;Acquaintances&lt;/span&gt;
+    &lt;div&gt;2&lt;/div&gt;&lt;div class="check"&gt;&lt;/div&gt;&lt;span&gt;Following&lt;/span&gt;
+    &lt;div class="createNew"&gt;Create new circle&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+  </article>
+
+  <article>
+    <h3>Manage focus.</h3>
+    <ul>
+      <li>Make custom interactive elements focusable<br>
+      with <code>tabindex</code>:
+
+<pre style="margin-top: 1em;">&lt;!-- Natural tab order --&gt;
+&lt;div onclick="" tabindex="0"&gt;Clicky 1&lt;/div&gt;
+
+&lt;!-- Custom tab order --&gt;
+&lt;div onclick="" tabindex="7"&gt;Clicky 2&lt;/div&gt;
+
+&lt;!-- Focusable but not in tab order. This is useful when hiding
+focusable controls from sighted and keyboard-only users --&gt;
+&lt;div onclick="" tabindex="-1"&gt;Clicky 3&lt;/div&gt;
+</pre>
+    <li>Proactively place focus with <code>element.focus()</code><br> to create an efficient workflow.
+  </ul>
+  </article>
+ 
+  <article>
+    <h3>Show the keyboard some love</h3>
+    <ul>
+      <li>
+            Custom controls should respond to keys like Enter, Space,
+            Arrows, Escape, etc. as appropriate.<br>
+            <i>Pick a native control and mimic it!</i>
+          </li>
+      <li>The W3C has a good
+      <a href="http://www.w3.org/TR/wai-aria-practices/#aria_ex">guide to common keyboard patterns.</a>
+        </ul>
+
+<pre>&lt;div id="reply_icon"
+     tabindex="0"
+     onclick="reply()"
+     onkeydown="return onReplyKeydown(event)"&gt;Reply&lt;/div&gt;
+&lt;script&gt;
+  function onReplyKeydown(event) {
+    if (event.keyCode == 32 || event.keyCode == 13)  // Space / Enter
+      reply();
+  }
+&lt;/script&gt;</pre>
+</article>
+  
+  <article>
+  <style>
+    .addtocircles_img1 {
+      position: relative;
+      margin-left: auto;
+      margin-right: auto;
+      width: 185px;
+      height: 77px;
+      margin-top: 15px;
+      margin-bottom: -20px;
+    }
+  </style>
+    <h3>The Add to Circles Widget</h3>
+    <div class="addtocircles_img1">
+    <img src="images/addtocircles_widget.jpg" alt="Add To Circles widget image" />
+    </div>
+    <ul>
+      <li>The Add to Circles control is most like a button, so we should mimic native button behavior:
+      <ul>
+        <li>Make the Add to Circles button keyboard-focusable with <code>tabindex="0"</code>
+      <pre style="margin-top: 1em;">
+&lt;div class="addToCircles_widget" tabindex="0"&gt;
+  &lt;span class="label" &gt;Add to circles&lt;/span&gt;&lt;/div&gt;
+</pre>
+      <li>Allow keydown events like ENTER and SPACE to activate the button and show the dropdown.
+      </ul>
+    </ul>
+  </article>
+  
+  <article>
+  <style>
+    .addtocircles_img2 {
+      position: relative;
+      margin-left: auto;
+      margin-right: auto;
+      width: 213px;
+      height: 125px;
+      margin-top: 15px;
+      margin-bottom: -20px;
+    }
+  </style>
+    <h3>The Add to Circles Dropdown</h3>
+    <div class="addtocircles_img2">
+    <img src="images/addtocircles_dropdown.jpg" alt="Circle Picker Menu" />
+    </div>
+    <ul>
+      <li>The Add to Circles Dropdown is most like a modal dialog, so we should implement dialog behavior:
+      <ul>
+        <li>When the dialog opens, set focus on the first<br>
+        focusable element.
+      <pre style="margin-top: 1em;">
+dialog.$('firstFocusableElt').focus();
+</pre>
+      <li>Trap focus inside the dialog.
+      <li>Add ESC as a keyboard shortcut to close the dialog.
+      <li>When the dialog closes, set focus back on the Add to Circles button.
+    </ul>
+    </ul>
+  </article>
+
+  <article>
+    <h3>Add ARIA for screen readers</h3>
+    <ul>
+      <li>ARIA attributes provide semantic information to screen readers that is normally conveyed
+      visually.
+      <li>Note that using ARIA does not automatically implement the standard widget behavior - you'll
+      still need to add focus management and keyboard navigation yourself.
+    </ul>
+  </article>
+  
+  <article>
+    <h3>ARIA Roles</h3>
+    <ul>
+      <li>Use the ARIA <code>role</code> attribute to indicate that a generic tag is playing the role of a standard
+      widget like a button.
+      <pre style="margin: 1em 0px 0.5em 0px;">&lt;div tabindex="0" role="button"&gt;Send&lt;/div&gt;
+</pre>
+      <li>ARIA roles also indicate composite controls that do not have a native HTML equivalent.
+      <pre style="margin: 1em 0px 0.5em 0px;">&lt;div tabindex="0" role="menuitem"&gt;Paste&lt;/div&gt;
+</pre>
+      <li>ARIA landmark roles can be used to identify separate areas of your app.
+      <pre style="margin: 1em 0px 0.5em 0px;">&lt;section role="search"&gt;Search this Site ...&lt;/section&gt;
+</pre>
+    </ul>
+  </article>
+  
+  <article>
+    <h3>ARIA States and Properties</h3>
+    <ul>
+      <li>Use ARIA states to add dynamic information about the current state of an element.
+      <li>Remember to update ARIA states in your JavaScript!
+    </ul>
+<pre style="margin: 1em 0px -0.5em -20px;">&lt;div tabindex="0" role="checkbox" aria-checked="true"&gt;</pre>
+    <ul>
+      <li>The ARIA property <code>aria-live</code> identifies dynamic content on a page.
+      <ul>
+      <li><code>aria-live</code> is added to elements that will be updated and describes the type of
+      updates the element receives.
+        <li>For more information on ARIA live regions, see the
+        <a href="http://www.w3.org/WAI/PF/aria-practices/#liveprops">W3C Guide to Live Region Properties.</a>
+        </ul>
+        </ul>
+  </article>
+  
+  <article>
+    <h3>ARIA and the Add to Circles Widget</h3>
+    <div class="addtocircles_imgs">
+    <img src="images/addtocircles_widget.jpg" alt="Add To Circles widget image" />
+    <img src="images/addtocircles_dropdown.jpg" alt="Circle Picker Menu" />
+    </div>
+    <ul>
+        <li>Specify that the Add to Circles element is a button.
+        <pre style="margin-top: 1em;">
+&lt;div class="addToCircles_widget" tabindex="0" role="button"&gt;
+  &lt;span class="label" &gt;Add to circles&lt;/span&gt;&lt;/div&gt;
+</pre>
+        <li>Specify that the Add to Circles dialog is a dialog.
+          <pre style="margin-top: 1em;">
+&lt;div class="circlePicker" role="dialog"&gt;</pre>
+        <li>Specify that the checkbox divs are...checkboxes.
+          <pre style="margin-top: 1em;">
+&lt;div class="check" role="checkbox" aria-checked="false"&gt;</pre>
+    </ul>
+  </article>
+  
+  <article>
+    <h2>Recap</h2>
+  </article>
+
+  <article>
+    <h3>An Accessible Web App:</h3>
+    <ul>
+        <li>Has the DOM structured in a sensible way.
+        <li>Uses native HTML tags instead of div soup.
+        <li>Labels all controls and images.
+        <li>Implements intuitive focus management.
+        <li><strong>Can be used entirely with the keyboard!</strong>        <li>Includes ARIA for screen readers.
+    </ul>
+    <ul>
+        <li>Has custom controls that follow this advice too!
+    </ul>
+  </article>
+
+  <article>
+    <h2>Tools & Resources</h2>
+  </article>
+
+      <article>
+      <style>
+        h4 {
+          margin-bottom: -25px !important;
+        }
+      </style>
+        <h4>
+          ChromeVox [http://goo.gl/y6Cfk]
+        </h4>
+        <ul>
+          <li>Built-into Chrome OS, available as an extension for Chrome on
+              other platforms.
+        </ul>
+        <h4>
+          ChromeShades [http://goo.gl/BXQU2]
+        </h4>
+        <ul>
+          <li>Accessibility testing tool for developers.
+          <li>When ChromeShades is running, everything is reformatted
+              as text-only and organized more like how a blind
+              user would perceive the page with a screen reader.
+		</ul>
+		<ul>
+		  <li>Install both from <a href="http://code.google.com/p/google-axs-chrome/">google-axs-chrome.googlecode.com</a>
+		</ul>
+  </article>
+      <article>
+      <style>
+      </style>
+		<h4>Some no-cost screen readers:</h4>
+		  <ul>
+		  <li><a href="http://www.apple.com/accessibility/voiceover/">VoiceOver</a>
+		  <li><a href="http://www.nvda-project.org/">NVDA</a>
+		  </ul>
+		<h4>Some libraries with accessibility support:</h4>
+		  <ul>
+		  <li><a href="http://dojotoolkit.org/">Dojo Toolkit</a>
+		  <li><a href="http://code.google.com/webtoolkit/">GWT</a>
+		  <li><a href="http://jqueryui.com/">jQuery UI</a>
+          </ul>
+      </article>
+      
+      
+
+      <article>
+        <h3>
+          Final thoughts
+        </h3>
+
+        <ul>
+          <li>Whether you're building a Web App from scratch or working on refining complex widgets, you can deliver
+          a dynamic accessible experience.
+
+          <li>The first step doesn't require any special tools or
+              expertise: <i>just unplug your mouse</i>.
+
+          <li>HTML5 standards, especially ARIA, get you the rest of the
+              way there.
+        </ul>
+
+      </article>
+
+      <article>
+        <h3>Presentation Code</h3>
+          <a href="http://google-axs-chrome.googlecode.com">
+            google-axs-chrome.googlecode.com
+          </a></p>
+        <p><h3>ChromeVox Discussion List</h3>
+        <a href="http://groups.google.com/group/axs-chrome-discuss?pli=1">
+        axs-chrome-discuss@google.com
+        </a></<p>
+        <p><h3>Google's Accessibility Site</h3>
+        <a href="http://google.com/accessibility">
+        google.com/accessibility
+        </a></p>
+      </article>
+
+
+  <article class="biglogo"></article>
+
+</section>
+
+<script> 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-XXXXXX-X']);
+  _gaq.push(['_trackPageview']);
+ 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script> 
+<!--[if IE]>
+<script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+<script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+
+</body>
+</html>

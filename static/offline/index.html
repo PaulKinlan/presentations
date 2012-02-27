@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Offline (as your world used to be)</title>
+
+    <meta charset='utf-8'>
+  </head>
+  
+  <style>
+    
+    
+  </style>
+
+  <body style='display: none'>
+
+  <section class='slides layout-regular template-default'>
+
+  <article class="title-slide"> 
+    <div> 
+      <div data-config-logo></div> 
+      <p data-config-name></p> 
+      <h1>Offline</h1> 
+      <p style="color:#545454;">As your world used to be</p> 
+      <p class="info"> 
+        <time datetime="YYYY-MM-DD" data-config-date>MM DD, 2011</time> &nbsp; - &nbsp; <span data-config-location></span> 
+      </p> 
+      <!-- <img data-config-map class="rounded" title="Of course we're using Geolocation!" alt="Of course we're using Geolocation!">  -->
+    </div> 
+  </article>
+
+  <article id="who">
+    <h3>Who?</h3>
+    <p>
+      <img class="avatar rounded" data-config-pic>
+    </p>
+    <p>
+      <a rel="author" data-config-gplus target="_blank">
+        <img src="http://www.google.com/images/icons/ui/gprofile_button-44.png" width="44" height="44">
+      </a> +<a rel="author" data-config-gplus target="_blank"><span data-config-name></span></a>
+    </p>
+    <br>
+    <p>
+      <a rel="author" data-config-twitter target="_blank" style="margin-left:-8px;">
+        <img src="images/twitter_newbird_blue.png" width="58" height="58">
+      </a> @ <a rel="author" data-config-twitter target="_blank" style="margin-left:-8px;"><span data-config-twitter></span></a>
+    </p>
+    <br>
+    <p>
+      Slides: <a style="display: inline" href="http://devfest-html5-offline.appspot.com">http://devfest-html5-offline.appspot.com</a>
+    </p>
+  </article>
+
+  <article>
+    <h3>Summary</h3>
+    <ul>
+      <li>Store dynamic data
+      <li>Store static resources
+      <li>Store binary data and modify it (e.g. images)
+      <li>Sync data with server
+      <li>Increase app performance
+  </article>
+
+  <article>
+    <h3>Before HTML5</h3>
+    <ul>
+      <li>Cookies
+      <li>Flash Storage
+      <li>Internet Explorer UserData
+      <li>Google Gears
+      <li>Dojo Storage
+      <li>window.name ( hack )
+    </ul>
+  </article>  
+  
+  <article>
+    <h3>Why offline?</h3>
+    <ul class="build">
+      <li>Airplane, road trip, deserted island
+      <li>Flaky connections (e.g. cafes, car, short daily trips)
+      <li>Better performance
+      <li>Consolidates the concept of permanent app you will have always available
+      
+    </ul>
+  </article>
+
+  <article class="fill"> 
+    <h2>Store Dynamic Data</h2>
+  </article> 
+
+  <article class="fill">
+    <h4>Web Storage (localStorage/sessionStorage)</h4>
+    <ul>
+      <li>Store unstructured data
+      <li>Store miscellaneous data (user/game/app preferences)
+      <li>Use cases of cookies but saving HTTP requests
+    </ul>
+    <h4>IndexedDB/WebSQL</h4>
+    <ul>
+      <li>Store structured data
+      <li>Handle simultaneous data operations (with transactions)
+    </ul>
+  </article> 
+
+  <article> 
+    <h3>localStorage</h3>
+    <p>localStorage for simple key-value storage</p>
+    <pre>
+if (!localStorage.getItem("checkins")) {
+  localStorage.setItem("checkins", JSON.stringify([]));
+}</pre>
+
+ <p>Easy API</p>
+<pre>
+setItem()
+getItem()
+removeItem()
+clear()</pre>
+
+  </article>
+
+  
+
+  <article> 
+    <h3>sessionStorage</h3> 
+  
+    <pre>window.sessionStorage</pre>
+    
+    <ul>
+    <li>Same as localStorage but...
+    <li>Lasts as long as browser is open
+    <li>Opening page in new window or tab starts new session
+    <li>Great for temporal data (e.g. form progress)
+    </ul>
+  </article>
+  
+  <article>
+    <h3>Web Storage APIs only store strings!</h3>
+    <p>Solution:</p>
+<pre>var userstr = JSON.stringify({
+  user: 'john',
+  id: 10
+});
+
+localStorage.setItem('user', userstr);
+
+var user = JSON.parse(localStorage.getItem('user'));
+</pre>
+  </article>
+  
+  <article>
+    <h3>Web Storage API</h3>
+      <ul>
+        <li>Scoped to an origin</li>
+      </ul>
+      <pre>
+  http://example.com:80/
+    \       \         \_ port
+     \       \_ domain
+      \_ scheme
+  </pre>
+  </article>
+  
+  <article>
+    <style> 
+      #ta {
+        font-size: 19px;
+        width: 400px;
+        height: 150px;
+        display: block;
+      }
+      #localstorage-message {
+        font-size: 19px;
+        padding-top: 50px;
+      }
+    </style>
+    <h3>Example: Auto-save Text</h3>
+    <textarea id="ta" placeholder="Type your text here..."></textarea> 
+    <button id="save-ta">Save</button> 
+    <p id="ta-log"></p> 
+    <script defer> 
+      (function(){
+
+        try {
+          (window.localStorage.getItem) // will throw in Firefox under some settings
+        } catch(e){
+          return; // quit because dom.storage.enabled is false
+        }
+
+        var area = document.querySelector('#ta');
+        // place content from previous edit
+        if (!area.value) {
+          area.value = window.localStorage.getItem('value');
+        }
+        updateLog(false);
+
+        // your content will be saved locally
+        document.querySelector('#save-ta').addEventListener('click', function () {
+          window.localStorage.setItem('value', area.value);
+          window.localStorage.setItem('timestamp', (new Date()).getTime());
+          updateLog(true);
+        }, false);
+
+        function updateLog(new_save) {
+          var log = document.querySelector("#ta-log");
+          var delta = 0;
+          if (window.localStorage.getItem('value')) {
+            delta = ((new Date()).getTime() - (new Date()).setTime(window.localStorage.getItem('timestamp'))) / 1000;
+            if (new_save) {
+              log.textContent = 'Saved. Content will be available after browser refresh/reopen.';
+              setTimeout(function() {
+                log.textContent = '';
+              }, 3000);
+            } else {
+              log.textContent = 'last saved: ' + delta + 's ago';
+            }
+          }
+        }
+
+      })();  
+    </script>
+<pre>document.querySelector('#ta').addEventListener('keyup', function(e) {
+  localStorage.setItem('value', this.value);
+  localStorage.setItem('timestamp', (new Date()).getTime());
+}, false);
+</pre>
+  </article>
+
+  <article>
+    <h3>IndexedDB</h3>
+    <p>Currently only Chrome and Firefox have implemented IndexedDB, however, the major browser vendors have indicated an intention to support it.</p>
+
+    <p>Today, it's supported via vendor prefixes. Let's simplify this:</p>
+<pre>window.indexedDB =
+    window.indexedDB ||
+    window.webkitIndexedDB ||
+    window.mozIndexedDB;
+</pre>
+  </article>
+
+  <article> 
+    <h3>IndexedDB</h3>
+    <ul>
+      <li>Instead of using SQL, you query an <b>index</b>, obtain a <b>cursor</b>, and iterate on the <b>result set</b>.
+      <li>An <b>index</b> is a structure that speeds up the retrieval of data retrieval operations.
+      <li>A <b>cursor</b> is a control structure that enables traversal over a database result. They are the database equivalent of iterators.
+      <li>The <b>result set</b> is the collection of objects that matched a particular query.
+  </article>
+  
+  <article>
+    <h3>Finding things</h3>
+
+    <p>Retrieving by key ( indexes ):</p>
+  <pre>
+// db.createObjectStore("Friend", "id", true);
+db.<b>createIndex</b>("FriendNames", "name", false);
+var index = db.<b>openIndex</b>('FriendNames');
+var id = <b>index.get</b>('Eric');
+</pre>
+    <p>Querying ( cursors ):</p>
+    <pre>
+// Restrict to names beginning A-E
+var range = new <b>KeyRange.bound</b>('A', 'E');
+var cursor = <b>index.openObjectCursor</b>(range);
+
+while (<b>cursor.continue</b>()) {
+  console.log(<b>cursor.value.name</b>);
+}
+</pre>
+  </article>
+  
+  <article class="slide deck-after" id="indexeddb-example"> 
+    <style>
+      #indexeddb-example input { font-size: 16px; }
+      #indexeddb-example .record-list li:nth-child(odd) { background-color: #eee; }
+      #indexeddb-example .record-list li:nth-child(even) { background-color: #ddd; }
+      #indexeddb-example .record-list li {
+        padding-left: 5px;
+      }
+      #idb-results {
+        max-height: 250px;
+        overflow: auto;
+        text-align: left;
+        padding: 0;
+      }
+      .keyval {
+        border: 1px dashed;
+        padding: 4px;
+        outline: none;
+      }
+      #indexeddb-example .error {
+        color: red;
+      }
+    </style>
+    <pre style="font-size: 16px">var idbRequest = window.<b>indexedDB</b>.<b>open</b>('Database Name');
+idbRequest.onsuccess = function(event) {
+  <b>var db = event.srcElement.result</b>;
+  var transaction = db.<b>transaction</b>([], <b>IDBTransaction.READ_ONLY</b>);
+  var curRequest = transaction.<b>objectStore</b>('ObjectStore Name').<b>openCursor</b>();
+  curRequest.<b>onsuccess</b> = ...;
+};</pre>
+    <div class="center" id="indexeddb-example">
+      <input type="text" placeholder="key" id="idb-key" size="10" /> <input type="text" placeholder="value" id="idb-value" size="15" />
+      <button onclick="indexedDbSample.idbSet()">set</button>
+      <button onclick="indexedDbSample.idbCreate()">create objectStore</button>
+      <button onclick="indexedDbSample.idbRemove()">remove objectStore</button>
+      <div id="idb-log"></div>
+      <div class="record-list" id="idb-results-wrapper"></div>
+    </div>
+    <script defer>
+      var indexedDbSample = (function() {
+        var idb_;
+        var idbRequest_;
+        var idbLog_ = document.getElementById('idb-log');
+        var idResultsWrapper_ = document.getElementById('idb-results-wrapper');
+
+        // IndexedDB spec is still evolving, various browsers keep it
+        // behind various flags and implementation varies.
+        if ('webkitIndexedDB' in window) {
+          window.indexedDB = window.webkitIndexedDB;
+          window.IDBTransaction = window.webkitIDBTransaction;
+        } else if ('moz_indexedDB' in window) {
+          window.indexedDB = window.moz_indexedDB;
+        }
+
+        // Open our IndexedDB if the browser supports it.
+        if (window.indexedDB) {
+          idbRequest_ = window.indexedDB.open("Test", "A test object store.");
+          idbRequest_.onerror = idbError_;
+          idbRequest_.addEventListener('success', function(event) {
+            idb_ = event.srcElement.result;
+            idbShow_(event);
+          }, false);
+        }
+
+        function idbError_(event) {
+          idbLog_.innerHTML += '<p class="error">Error: ' +
+                               event.message + ' (' + event.code + ')</p>';
+        }
+
+        function idbShow_(event) {
+          if (!idb_.objectStoreNames.contains('myObjectStore')) {
+            idbLog_.innerHTML = "<p>Object store not yet created.</p>";
+            return;
+          }
+
+          var html = [];
+          var transaction = idb_.transaction([], IDBTransaction.READ_ONLY); // Read is default.
+          var request = transaction.objectStore('myObjectStore').openCursor(); // Get all results.
+
+          // This callback will continue to be called until we have no more results.
+          request.onsuccess = function(e) {
+            var cursor = e.srcElement.result;
+            if (!cursor) {
+              idResultsWrapper_.innerHTML = '<ul class="record-list" id="idb-results">' + html.join('') + '</ul>';
+              return;
+            }
+            html.push('<li><span class="keyval" contenteditable onblur="indexedDbSample.updateKey(\'',
+                      cursor.key, '\', this)">', cursor.key, '</span> ',
+                      '=> <span class="keyval" contenteditable onblur="indexedDbSample.updateValue(\'',
+                      cursor.key, '\', this)">', cursor.value, '</span>&nbsp; ',
+                      '<a href="javascript:void(0)" onclick="indexedDbSample.deleteKey(\'',
+                      cursor.key, '\')">[Delete]</a></li>');
+            cursor.continue();
+          }
+          request.onerror = idbError_;
+        }
+
+        function idbCreate_() {
+          if (!idb_) {
+            if (idbRequest_) {
+              idbRequest_.addEventListener('success', removeObjectStore, false); // If indexedDB is still opening, just queue this up.
+            }
+            return;
+          }
+
+          var request = idb_.setVersion('the new version string');
+          request.onerror = idbError_;
+          request.onsuccess = function(e) {
+            if (!idb_.objectStoreNames.contains('myObjectStore')) {
+              try {
+                var objectStore = idb_.createObjectStore('myObjectStore', null); // FF is requiring the 2nd keyPath arg. It can be optional :(
+                idbLog_.innerHTML = "<p>Object store created.</p>";
+              } catch (err) {
+                idbLog_.innerHTML = '<p class="error">' + err.toString() + '</p>';
+              }
+            } else {
+              idbLog_.innerHTML = '<p class="error">Object store already exists.</p>';
+            }
+          }
+        }
+
+        function idbSet_() {
+          if (!idb_) {
+            if (idbRequest_) {
+              idbRequest_.addEventListener('success', removeObjectStore, false); // If indexedDB is still opening, just queue this up.
+            }
+            return;
+          }
+
+          if (!idb_.objectStoreNames.contains('myObjectStore')) {
+            idbLog_.innerHTML = "<p class=\"error\">Object store doesn't exist.</p>";
+            return;
+          }
+
+           // Create a transaction that locks the world.
+          var objectStore = idb_.transaction([], IDBTransaction.READ_WRITE)
+                                .objectStore("myObjectStore");
+          var request = objectStore.put(
+              document.getElementById('idb-value').value,
+              document.getElementById('idb-key').value);
+          request.onerror = idbError_;
+          request.onsuccess = idbShow_;
+        }
+
+        function updateKey_(key, element) {
+          var newKey = element.textContent;
+          var transaction = idb_.transaction([], IDBTransaction.READ_WRITE); // Create a transaction that locks the world.
+          var objectStore = transaction.objectStore("myObjectStore");
+          var request = objectStore.get(key);
+          request.onerror = idbError_;
+          request.onsuccess = function(event) {
+            var value = event.srcElement.result;
+            if (objectStore.delete) {
+              var request = objectStore.delete(key);
+            } else {
+              var request = objectStore.remove(key);
+            }
+            request.onerror = idbError_;
+            request.onsuccess = function(event) {
+              var request = objectStore.add(value, newKey);
+              request.onerror = idbError_;
+              request.onsuccess = idbShow_;
+            };
+          };
+        }
+
+        function updateValue_(key, element) {
+          var transaction = idb_.transaction([], IDBTransaction.READ_WRITE); // Create a transaction that locks the world.
+          var objectStore = transaction.objectStore("myObjectStore");
+          var request = objectStore.put(element.textContent, key);
+          request.onerror = idbError_;
+          request.onsuccess = idbShow_;
+        }
+
+        function deleteKey_(key) {
+          var transaction = idb_.transaction([], IDBTransaction.READ_WRITE); // Create a transaction that locks the world.
+          var objectStore = transaction.objectStore("myObjectStore");
+          if (objectStore.delete) {
+            var request = objectStore.delete(key);
+          } else {
+            var request = objectStore.remove(key);
+          }
+          request.onerror = idbError_;
+          request.onsuccess = idbShow_;
+        }
+
+        function idbRemove_() {
+          if (!idb_) {
+            if (idbRequest_) {
+              idbRequest_.addEventListener('success', removeObjectStore, false); // If indexedDB is still opening, just queue this up.
+            }
+            return;
+          }
+
+          var request = idb_.setVersion("the new version string");
+          request.onerror = idbError_;
+          request.onsuccess = function(event) {
+
+            if (idb_.objectStoreNames.contains('myObjectStore')) {
+              try {
+                // Spec has been updated to deleteObjectStore.
+                if (idb_.deleteObjectStore) {
+                  idb_.deleteObjectStore('myObjectStore');
+                } else {
+                  idb_.removeObjectStore('myObjectStore');
+                }
+                idResultsWrapper_.innerHTML = '';
+                idbLog_.innerHTML = "<p>Object store removed.</p>";
+              } catch (err) {
+                idbLog_.innerHTML = '<p class="error">' + err.toString() + '</p>';
+              }
+            } else {
+              idbLog_.innerHTML = "<p class=\"error\">Object store doesn't exist.</p>";
+            }
+          };
+        }
+
+        return {
+          idbSet: idbSet_,
+          idbCreate: idbCreate_,
+          idbRemove: idbRemove_,
+          updateKey: updateKey_,
+          updateValue: updateValue_,
+          deleteKey: deleteKey_
+        }
+      })();
+    </script>
+  </article>
+
+  <article>
+    <h3>WebSQL?</h3>
+    <ul>
+      <li>targeting mobile devices?
+      <li>Use <a href="http://westcoastlogic.com/lawnchair/">Lawnchair</a>
+    </ul>
+  </article>
+    
+  <article class="fill"> 
+    <h2>Store Static Resources</h2>
+  </article> 
+
+  <article>
+    <h3>App Cache</h3>
+    <ul>
+      <li>Caches entire web app locally!</li>
+      <li>Why?
+        <ul>
+          <li>HTML, CSS, and JS stay fairly consistent</li>
+          <li>Native browser caching is unreliable</li>
+          <li>Caching resources creates speedier apps!
+            <ul>
+              <li>Used by iPhone &amp; Android GMail app</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Decent mobile support</li>
+    </ul>
+  </article>
+
+  <article>
+    <h3>App Cache</h3>
+    <pre class="hcenter">
+&lt;html <b>manifest="example.appcache"</b>&gt;... &lt;/html&gt;
+</pre>
+    <pre style="margin-top:10px;font-size:18px">
+<b>CACHE MANIFEST</b>
+# 2010-11-17-v0.0.1
+
+# Explicitly cached entries
+<b>CACHE</b>:
+index.html
+stylesheet.css
+images/logo.png
+
+# static.html will be served if the user is offline
+<b>FALLBACK</b>:
+/ /static.html
+
+# Resources that require the user to be online.
+<b>NETWORK</b>:
+*
+</pre>
+  </article>
+
+  <article>
+    <h3>App Cache Gotchas</h3>
+    <ul class=build>
+      <li>html docs w/ appcache are cached</li>
+      <li>Serve with mime-type: <code>text/cache-manifest</code></p>
+      <li>just one 404 → nothing is cached</li>
+      <li>Syntax errors in the manifest cancels cache (use <a href="http://manifest-validator.com/">validator</a>)</li>
+      <li>Must rev manifest to update resources</li>
+      <li>Update is served on 2nd reload (see next slide)</li>
+      <li><a href="http://appcachefacts.info/">appcachefacts.info</a></li>
+      <li>Manifest file <a href="http://westciv.com/tools/manifestR/">generator</a> tool</li>
+    </ul>
+  </article>
+
+  <article>
+    <h3>Load twice workaround</h3>
+    <pre style="font-size: 19px">
+applicationCache.addEventListener('updateready', function(e){
+  if (applicationCache.status == 
+         applicationCache.UPDATEREADY){
+    if (confirm('Load new content?')) {
+      ...
+    }
+  }
+});</pre>
+  </article>
+    
+  <article class="fill"> 
+    <h3>DEMO: Apps using offline features</h3>
+    <ul>
+      <li><a href="https://chrome.google.com/webstore/detail/ejidjjhkpiempkbhmpbfngldlkglhimk?hc=search&hcp=main">Offline Google Mail</a></li>
+      <li><a href="https://chrome.google.com/webstore/detail/ecmphppfkcfflgglcokcbdkofpfegoel?hc=search&hcp=main">NYTimes</a></li>
+      <li><a href="https://chrome.google.com/webstore/detail/decdfngdidijkdjgbknlnepdljfaepji?hc=search&hcp=main">Read Later Fast</a></li>
+      <li><a href="https://chrome.google.com/webstore/detail/kjebfhglflhjjjiceimfkgicifkhjlnm?hc=search&hcp=main">Scratchpad</a></li>
+    </ul>
+  </article>
+  
+  <article class="fill"> 
+    <h2>Store Binary Data And Modify It</h2>
+  </article> 
+  
+  <article> 
+    <h3>Opening the file system</h3> 
+    <pre>window.<b>requestFileSystem</b>(
+  TEMPORARY,        // persistent vs. temporary storage
+  1024 * 1024,      // size (bytes) of needed space
+  initFs,           // success callback
+  opt_errorHandler  // opt. error callback, denial of access
+);</pre>
+  </article>
+
+  <article>
+    <h3>1, 2, 3, Ways to generate URLs to files</h3> 
+    <ul> 
+      <li><span>Blob URLs ( <code>blob:</code> )</span></li> 
+      <li><span>Data URLs ( <code>data:</code> )</span></li> 
+      <li>File System URLs  ( <code>filesystem:</code> ) <span class="new">New</span></li> 
+    </ul> 
+    <pre>var img = document.createElement('img');
+
+// filesystem:http://example.com/temporary/myfile.png
+img.src = <b>fileEntry.toURL</b>();
+document.body.appendChild(img);
+</pre> 
+  <p>Retrieve a file by its filesystem URL:</p> 
+  <pre style="font-size: 16px"><b>window.resolveLocalFileSystemURL</b>(img.src, function(fileEntry) { ... });</pre>
+  </article>
+
+  <article> 
+    <h3>Fetching a file by name</h3> 
+    <pre style="font-size: 16px;">function initFs(fs) {
+
+  <b>fs.root.getFile</b>('logFile.txt', {create: true}, function(fileEntry) {
+
+    // <b>fileEntry.isFile</b> == true
+    // <b>fileEntry.name</b> == 'logFile.txt'
+    // <b>fileEntry.fullPath</b> == '/logFile.txt'
+
+    // Get a File obj
+    <b>fileEntry.file</b>(function(file) { ... }, errorHandler);
+
+    // <b>fileEntry.remove</b>(function() {}, errorHandler);
+    // <b>fileEntry.moveTo</b>(...);
+    // <b>fileEntry.copyTo</b>(...);
+    // <b>fileEntry.getParent</b>(function(dirEntry) {}, errorHandler);
+
+  }, errorHandler);
+
+}</pre>
+  </article>
+
+  <article> 
+    <h3>Duplicating user-dropped files</h3> 
+    <pre style="font-size: 15px;">document.querySelector('#terminal').ondrop = function(e) {
+  var files = <b>e.dataTransfer.files</b>;
+
+  window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+
+    Array.prototype.slice.call(files || [], 0).forEach(function(file, i) {
+      fs.root.getFile(file.name, {create: true, <b>exclusive: true</b>}, function(fileEntry) {
+        <b>fileEntry.createWriter</b>(function(fileWriter) {
+          <b>fileWriter.write(f)</b>; // Note: write() can take a File | Blob.
+        }, errorHandler);
+
+      }, errorHandler);
+    });
+
+  }, errorHandler);
+
+};</pre>
+  </article> 
+  
+  <article class="fill"> 
+    <h2>Data Synchronization</h2>
+  </article> 
+
+  <article> 
+    <h3>Data Synchronization</h3>
+    <ul>
+      <li>Use FALLBACK for files that duplicate functionality of your online app (with no structured data)
+      <li>Use templates that can also be parsed and filled by JS on the client
+      <li>Store all information retrieved by XHR calls on load time to the client to be used by the offline version of your app
+      <li>Update manifests and fallback files with hidden iframes
+      <li>More frameworks and sync patterns needed!!!
+    </ul>
+  </article>
+
+  <article> 
+    <h3>Data Synchronization: Shared Web Workers</h3>
+    <p>A Shared Worker can:</p>
+    <ul>
+      <li>Provide a single source of truth for connection status
+      <li>Ensure data consistency between windows of the same app
+      <li>Reduce the memory footprint of multiple app windows, by allowing some code (e.g. server communications) to be centralized
+    </ul>
+  </article>
+  <article> 
+    <h3><code>navigator.onLine</code> - know when you're all alone</h3> 
+    <pre>if (<b>navigator.onLine</b>) {
+  console.log('ONLINE!');
+} else {
+  console.log('Connection flaky');
+}
+</pre> 
+<pre>window.addEventListener('online', function(e) {
+  // Re-sync data with server.
+}, false);
+
+window.addEventListener('offline', function(e) {
+  // Queue up events for server.
+}, false);
+</pre> 
+  </article> 
+
+  <article class="fill"> 
+    <iframe src="http://html5-demos.appspot.com/static/navigator.onLine.html"></iframe> 
+  </article>
+
+  <article class="fill">
+    <h2>Increase app performance</h2>
+  </article>
+
+  <article>
+    <h3>Use offline features to increase performance</h3>
+    <ul class="build">
+      <li>Use web storage in place of cookies (Web Storage)
+      <li>Use client-side databases instead of server roundtrips (IndexedDB/WebSQL)
+      <li>Use cache manifest for live sites, not just offline apps (App Cache)
+      <li>Store binary files to be modified and reused (FileSystem API)
+    </ul>
+  </article>
+
+  <article>
+    <h3>Use offline features to increase performance</h3>
+    <p style="margin-top: 60px">"Google and Bing break up their JavaScript and CSS into smaller blocks and save them in localStorage on mobile devices. Simultaneously they set a cookie so that the server knows not to send that payload on subsequent searches, a savings of 150-170 kB before gzipping."</p>
+    <p style="float: right"><a href="http://www.stevesouders.com/blog/2011/09/26/app-cache-localstorage-survey/">App cache & localStorage survey</a> - Steve Souders</p>
+  </article>
+  <article>
+    <h3>Debug Offline Features</h3>
+    <img style="border: 2px solid grey; margin-top: 20px" src="images/devtools.png" />
+    <ul>
+      <li><a href="chrome://appcache-internals/">chrome://appcache-internals/</a>
+      <li><a href="chrome://blob-internals/">chrome://blob-internals/</a>
+      <li><a href="chrome://quota-internals/">chrome://quota-internals/</a>
+    </ul>
+  </article>
+
+  <article>
+    <h3>Quotas</h3>
+    <table border="0" cellspacing="5" cellpadding="5">
+      <tr><th></th><th>Website</th><th>Web App with manifest</th></tr>
+      <tr><td>localStorage</td><td>2.5Mb/5Mb</td><td>2.5Mb/5Mb</td></tr>
+      <tr><td>sessionStorage</td><td>Unlimited</td><td>Unlimited</td></tr>
+      <tr><td>IndexedDB</td><td>5Mb</td><td>Unlimited</td></tr>
+      <tr><td>App Cache</td><td>5Mb</td><td>Unlimited</td></tr>
+      <tr><td>WebSQL</td><td>5Mb</td><td>Unlimited</td></tr>
+      <tr><td>File System API</td><td>5Mb</td><td>Unlimited</td></tr>
+    </table>
+  </article> 
+
+  <article>
+    <h3>Quota API</h3>
+    <pre>
+// Request Status
+webkitStorageInfo.queryUsageAndQuota( 
+    webkitStorageInfo.TEMPORARY,   // or PERSISTENT 
+    usageCallback, 
+    errorCallback); 
+
+// Request Quota
+webkitStorageInfo.requestQuota( 
+    webkitStorageInfo.TEMPORARY,   // or PERSISTENT 
+    quotaCallback, 
+    errorCallback);</pre>
+  </article>
+
+  <article>
+    <h3>Support</h3>
+    <table border="0" cellspacing="5" cellpadding="5">
+      <tr>
+        <th></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-firefox.png"></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-safari.png"></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-chrome.png"></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/Opera_128x128.png" width=64</th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-ie.png"></th>
+      </tr>
+      <tr><td>Web Storage</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y (8+)</td></tr>
+      <tr><td>IndexedDB</td><td class="y">Y</td><td class="p">N</td><td class="y">Y</td><td class="p">N</td><td class="p">N</td></tr>
+      <tr><td>WebSQL</td><td class="n">N</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="n">N</td></tr>
+      <tr><td>App Cache</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y</td><td class="p">N</td></tr>
+      <tr><td>File System API</td><td class="p">N</td><td class="p">N</td><td class="y">Y</td><td class="p">N</td><td class="p">N</td></tr>
+    </table>
+    <ul><li><a href="http://caniuse.com">caniuse.com</a></li></ul>
+  </article> 
+
+  <article>
+    <h3>Support (Mobile)</h3>
+    <table border="0" cellspacing="5" cellpadding="5">
+      
+      <tr>
+        <th></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-firefox.png"></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/64-safari.png"></th>
+        <th><img src="http://gigapple.files.wordpress.com/2009/09/android_logo.png?w=64"></th>
+        <th><img src="http://paulirish.com/lovesyou/new-browser-logos/individual-browser-logos/Opera_128x128.png" width=64</th>
+        <th><img src="http://www.phonemag.com/blog/wp-content/uploads/2008/02/windows_mobile_logo.jpg" width=64></th>
+      </tr>
+
+      <tr><td>Web Storage</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y (2+)</td><td class="y">Y</td><td class="y">Y</td></tr>
+      <tr><td>IndexedDB</td><td class="y">Y</td><td class="p">N</td><td class="p">N</td><td class="p">N</td><td class="p">N</td></tr>
+      <tr><td>WebSQL</td><td class="n">N</td><td class="y">Y</td><td class="y">Y (2+)</td><td class="y">Y</td><td class="n">N</td></tr>
+      <tr><td>App Cache</td><td class="y">Y</td><td class="y">Y</td><td class="y">Y (2.1+)</td><td class="y">Y</td><td class="p">N</td></tr>
+      <tr><td>File System API</td><td class="p">N</td><td class="p">N</td><td class="y">Y (3+)</td><td class="p">N</td><td class="p">N</td></tr>
+    </table>
+    <ul><li><a href="http://mobilehtml5.org/">mobilehtml5.org</a></li></ul>
+  </article> 
+  
+
+  <article>
+    <h3>Package your app to get more quota (if you need it)</h3>
+    <p>For most apps, you can get them packaged up for distribution in a matter of a minute or two. Just go to <a href="">appmator.appspot.com</a>!</p>
+
+    <p>Because we're using the application cache, you may want to request the "unlimitedStorage" permission. Just paste it in manually to the manifest.json file.</p>
+  </article>
+  
+  <article>
+    <h3>Offlining your apps</h3>
+    <pre>{
+  "name": "Great App Name",
+  "description": "Pithy description",
+  "version": "0.0.0.1",
+  "icons": {
+    "128": "icon_128.png"
+  },
+  permissions : [ "unlimitedStorage" ],
+  <b>"offline_enabled": true,</b>
+  "app": {
+    ...
+  }
+}</pre>
+    <img style="border: 1px solid gray" width="600px" src="images/newtab.png" />
+  </article>
+
+  <article>
+    <h3>Polyfills</h3>
+    <p>Web Storage (LocalStorage and SessionStorage)</p>
+    <ul>
+      <li><a href="http://gist.github.com/350433">storage polyfill</a> by remy sharp
+      <li><a href="http://code.google.com/p/sessionstorage/">sessionstorage</a> by andrea giammarchi
+      <li><a href="http://amplifyjs.com/">Amplify.js</a> by appendTo HTML5 API with fallbacks for HTML4 browsers (including IE6)
+      <li><a href="https://github.com/marcuswestin/store.js">store.js</a> - with fallbacks for legacy browsers
+      <li><a href="http://developer.yahoo.com/yui/3/cache/#offline">YUI3 CacheOffline</a> by YUI team
+    </ul>
+  </article>
+
+  <article>
+    <h3>More Resources</h3>
+    <ul>
+      <li><a href="http://rezitech.github.com/stash/">Stash</a> - A JavaScript offline storage library
+      <li><a href="http://westcoastlogic.com/lawnchair/">Lawnchair</a> - Simple json storage
+      <li><a href="http://smus.com/game-asset-loader">Game Asset Loader</a> - To solve drawbacks of App Cache
+    </ul>
+    <a href="http://www.amazon.com/Using-HTML5-Filesystem-Eric-Bidelman/dp/1449309453"><img style="border: 2px solid grey" src="images/book.jpg" /></a>
+  </article>
+  
+  <article>
+    <h1>Thank you!</h1>
+
+    <p>Questions?
+
+  </article>
+  
+  </section>
+  <script src="js/config.js"></script>
+  <script src='js/slides.js'></script>
+
+  </body>
+</html>

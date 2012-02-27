@@ -1,0 +1,252 @@
+<!DOCTYPE html public "♥★♥★♥★♥">
+
+
+<html>
+  <head>
+    <title>Chrome Dev Tools: Tips and Tricks - GDD</title>
+
+    <meta charset='utf-8' />
+    <script src='slides.js'></script>
+  </head>
+
+
+  <body style='display: none'>
+
+    <section class='slides'>
+
+      <article class='biglogo'>
+      </article>
+
+      <article>
+        <img src="images/256-chrome.png" style="opacity: 0.5; position: absolute; right: 0; top: 0; width: 512px; z-index: -1">
+        <h1>
+          Chrome Dev Tools:
+          <br>
+            Tips and Tricks
+          </h1>
+          <p>
+          <span id="pres-name" contenteditable>Paul Kinlan</span>
+          <br><br>
+          <span id="pres-evt" contenteditable>Google Developer Day</span>
+          
+        </p>
+        <p>
+          <br>
+         These slides: <code>goo.gl/cq5DQ</code>
+        </p>
+      </article>
+      
+      <article>
+        
+        <q>The Chrome devtools
+                      is a
+              great webapp <!-- http://goo.gl/lAQs6 -->
+           that you can use to
+        develop great web apps</q>
+      </article>
+
+      <article>
+        <h3>
+          Agenda
+        </h3>
+        <ol>
+          <li>Styling Control &amp; CSS Manipulation</li>
+          <li>Network interaction</li>
+          <li>Console API</li>
+          <li>Script Debugging</li>
+          <li>Extension API</li>
+          <li>We recommend</li>
+          <li>Q &amp; A</li>
+        </ol>
+      </article>
+
+      <article>
+        <h3>
+          New here?
+        </h3>
+        <q>The Chrome Dev Tools in <span>60</span> seconds.</q>
+      </article>
+
+      <article>
+        <h3>
+          Styling Control
+        </h3>
+        <ul>
+          <li>Auto-complete everywhere</li>
+          <li>Quick color manipulation</li>
+          <li>New Style Rule</li>
+          <li>psuedo-class selector toggles
+              <br>
+              <img src="http://2.bp.blogspot.com/-zC_1v0Ijn3I/TjebiPOEHcI/AAAAAAAAJ9Q/BQoOmfAo6U8/s1600/csspsudeo2.png">
+        </ul>
+      </article>
+    
+      <article>
+        <h3>
+          CSS Manipulation
+        </h3>
+        <ul>
+          <li>CSS changes diffing</li>
+          <li>Revert to a revision</li>
+          <li>Save As...</li>
+          <li>Freeform stylesheet editing</li>
+          <li>Drag and drop elements
+        </ul>
+      </article>
+
+
+
+      <article>
+        <h3>
+           
+        </h3>
+
+        <ol>
+          <li>Styling Control &amp; CSS Manipulation</li>
+          <li class="selected">Network interaction</li>
+          <li>Console API</li>
+          <li>Script Debugging</li>
+          <li>Extension API</li>
+          <li>We recommend</li>
+          <li>Q &amp; A</li>
+        </ol>
+      </article>
+
+      <article>
+        <h3>
+          Network
+        </h3>
+        <ul class="build">
+         
+          <li>Timeline: network & rendering info</li>
+      <!--    <li>Precise network stack timers</li> -->
+          <li>Disable disk cache & other settings
+              <br>
+              <img src="http://paulirish.com/i/aaf530.png">
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Console API
+        </h3>
+        <ul>
+          <li>There is a lot more than just <code>console.log</code>!
+          <li>XMLHttpRequest Logging and Preserve Log</li>
+          <li><a target="_blank" href="http://getfirebug.com/wiki/index.php/Command_Line_API">Command Line API</a>, too</li>
+          <li><code>dir()</code>, <code>inspect()</code>, <code>$0</code>, <code>copy()</code>, <code>$$</code>, <code>monitorEvents</code>, <code>keys(), values()</code>
+          <li><a href="http://www.flickr.com/commons">Demo: flickr image grab</a></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+        </h3>
+
+        <ol>
+          <li>Styling Control &amp; CSS Manipulation</li>
+          <li>Network interaction</li>
+          <li>Console API</li>
+          <li class="selected">Script Debugging</li>
+          <li>Extension API</li>
+          <li>We recommend</li>
+          <li>Q &amp; A</li>
+        </ol>
+      </article>
+
+
+      <article>
+        <h3>
+          Debugging
+        </h3>
+        <ul>
+          <li><a target="_blank" href="http://code.google.com/team/">We'll use this page</a></li>
+          <li>DOM breakpoints</li>
+<!--          <li>Break on exception</li>
+          <li>DOM breakpoints</li> -->
+          <li>Event listener breakpoints</li>
+           <!-- <li>Timeline</li> -->
+          <li>Live edit JavaScript</li>
+          <li>No-refresh development™!</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Debugging
+        </h3>
+        <ul class=build>
+          <li>Script pretty-printing!</li>
+          <li> 
+            <img src="http://2.bp.blogspot.com/-gxQ1nFrM6uo/TjeMNclT-sI/AAAAAAAAJ8M/yeJ_e936Qk8/s1600/15602737155_vMBRP.jpg">
+            <img src="http://1.bp.blogspot.com/-MEtpXllQpjo/TjeNet65w_I/AAAAAAAAJ8g/jAOtWTQKwJI/s1600/15602795012_chhmv.jpg">
+
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Remote Debugging
+        </h3>
+        <ul>
+          <li><code>--remote-debugging-port=1337</code></li>
+          <li>Available with the RIM Playbook today</li--> <!-- http://www.berryreview.com/2011/04/15/hot-webkit-web-inspector-on-the-blackberry-playbook-for-web-developers/ -->
+
+        </ul>
+
+        <img src="images/remotedebugging.png" width=792>
+      </article>
+
+      <article>
+        <h3>
+         DevTools Extension APIs
+        </h3>
+        <ul>
+          <li><a href="http://code.google.com/chrome/extensions/trunk/experimental.devtools.panels.html">chrome.devtools.panels</a><br>
+          Custom panels and sidebars</li>
+          <li><a href="http://code.google.com/chrome/extensions/trunk/experimental.devtools.audits.html">chrome.devtools.audits</a><br>
+          Pluggable audits</li>
+          <li><a href="http://code.google.com/chrome/extensions/trunk/experimental.devtools.resources.html">chrome.devtools.resources</a><br>
+          HAR resources access</li>
+        </ul>
+      
+      </article>
+
+      <article>
+        <h3>
+          We recommend
+        </h3>
+        <ul>
+          <li>Use the Chrome Dev Channel or Canary</li>
+          <li>File tickets at <a href="//new.crbug.com">new.crbug.com</a>
+          <li>Hit <code>?</code> for keyboard shortcuts</li>
+          <li><a href="http://code.google.com/chrome/devtools/">code.google.com/chrome/devtools</a> has documentation and videos
+          <li><a href="http://smus.com/devtools-cheatsheet">smus.com/devtools-cheatsheet</a> for a useful one-pager
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Thank you!
+        </h3>
+        
+        <ul>
+         
+          <li>
+            <a href="http://code.google.com/chrome/devtools/">code.google.com/chrome/devtools</a>
+            <li>@ChromiumDev
+        </ul>
+
+
+          
+
+        <br><br>
+            These slides: <code>goo.gl/cq5DQ</code>
+           
+            
+      </article>
+
+    </section>
+
+  </body>
+</html>
