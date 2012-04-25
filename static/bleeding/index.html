@@ -153,23 +153,22 @@ Author: Eric Bidelman (ericbidelman@chromium.org)
   <article>
     <h3>Agenda</h3>
     <ul class="fade">
-      <!--<li><label class="underline">Richer</label> Web Apps ( Semantics &amp; Markup )</li>-->
-      <li><label class="underline">Intelligent</label> Web Apps ( Smarter Platform )
-        <ul>
-          <li>Web Intents</li>
-        </ul>
-      </li>
-      <li><label class="underline">Rich</label> Multimedia ( Powerful New APIs )
-        <ul>
-          <li>Fullscreen API</li>
-          <li>Web RTC</li>
-          <li>Web Audio API</li>
-        </ul>
-      </li>
-    </ul>
-  </article>
+    <li><label class="underline">Richer</label> Web Apps ( Semantics &amp; Markup )</li>
+    <li><label class="underline">Intelligent</label> Web Apps ( Smarter Platform )
+      <ul>
+        <li>Web Intents</li>
+      </ul>
+    </li>
+    <li><label class="underline">Rich</label> Multimedia ( Powerful New APIs )
+      <ul>
+        <li>Fullscreen API</li>
+        <li>Web RTC</li>
+        <li>Web Audio API</li>
+      </ul>
+    </li>
+  </ul>
+</article>
 
-<!--
   <article class="fill">
     <section class="flexcenter" style="height:100%;">
       <h1 class="black centered"><label class="underline">Richer</label> Web Apps</h1>
@@ -307,14 +306,6 @@ input.addEventListener('change', inputChange, false);
 input.addEventListener('<b>webkitspeechchange</b>', inputChange, false);
 </pre>
   </article>
--->
-
-  <!--<article class="fill" style="background-image: url(images/core.jpg)">
-    <h2>Core Platform ( JS )</h2>
-    <div class='source'>
-      <a href="http://www.flickr.com/photos/jim031956/5176010917/sizes/l/in/photostream/">http://www.flickr.com/photos/jim031956/5176010917/sizes/l/in/photostream/</a>
-    </div>
-  </article>-->
 
   <article class="fill" style="background-image: url(images/book.jpg)">
     <section class="flexcenter" style="height:100%;">
@@ -509,7 +500,6 @@ window.addEventListener('offline', function(e) {
     <iframe src="http://html5-demos.appspot.com/static/navigator.onLine.html"></iframe>
   </article>
 
-<!--
   <article>
     <h3>Custom (web-based) protocol handlers</h3>
     <aside class="note">
@@ -547,7 +537,6 @@ GET http://example.com/handler?q=web+myscheme:some%20data%20here
           document.location.origin + document.location.pathname + 'handler?q=%s', 'My App');
     }, false);
   </script>
--->
 
   <article class="fill" style="background-image: url(images/confusion.jpg)">
     <h2 class="right megabottom">Web Intents</h2>
@@ -557,25 +546,9 @@ GET http://example.com/handler?q=web+myscheme:some%20data%20here
     </div>
   </article>
 
-<!--
-  <article>
-    <h3>The web has a problem...</h3>
-    <ul class="fade">
-      <li>Tons of great services out there</li>
-      <li>Users expect these apps to work together seamlessly</li>
-      <li>Impossible for app developers to anticipate every new service to integrate with</li>
-      <li><b>All of these apps are siloed</b></li>
-    </ul>
-    <p class="centered"><img src="images/miscomm.jpg" height="250" class="rounded" title="Everyone is doing their own thing" alt="Everyone is doing their own thing"></p>
-  </article>
--->
-
   <article class="fill">
     <h4 class="bubble rounded">The web has a problem...</h4>
     <img src="images/problem.jpg">
-  </article>
-
-  <article class="fill" style="background-image: url(images/frustrateduser.jpg)">
   </article>
 
   <article class="fill" style="background-image: url(images/services.jpg)">
@@ -635,7 +608,7 @@ GET http://example.com/handler?q=web+myscheme:some%20data%20here
 var intent = new Intent();
 intent.action = 'http://webintents.org/share';
 intent.type = 'image/*';
-intent.data = [imgData];
+intent.data = imgData;
 
 <b>window.navigator.startActivity(intent);</b>
 </pre>
@@ -677,6 +650,10 @@ window.intent.postResult([ ... some data ... ]);
     <a href="http://demos.webintents.org/memegen/" target="_blank">Demo App</a>
   </article>
 
+  <article>
+    <h3>Deep Dive in to Web Intents later</h3>
+  </article>
+
   <article class="fill">
     <section class="flexcenter" style="height:100%;">
       <h1 class="white centered"><label class="underline">Rich</label> Multimedia</h1>
@@ -687,7 +664,6 @@ window.intent.postResult([ ... some data ... ]);
     </div>
   </article>
 
-<!--
    <article>
       <h3>Pasting files</h3>
       <pre>
@@ -720,7 +696,6 @@ document.body.onpaste = function(e) {
     }
   };
   </script>
--->
 
   <article class="smaller">
     <h3>Camera &amp; microphone access</h3>
@@ -926,12 +901,6 @@ MediaElement.webkitExitFullScreen()
     </ul>
   </article>
 
-  <article class="webrtc-slide">
-    <h3>Architecture</h3>
-    <img src="images/webrtc-arch.jpg" class="centered rounded reflect">
-  </article>
-
-<!--
   <article class="smaller" class="webrtc-slide">
     <h3><code>Example</code></h3>
       <pre>
@@ -956,7 +925,6 @@ window.navigator.webkitGetUserMedia('video,audio', function(localStream) {
 }, function(e) { ... });
 </pre>
   </article>
--->
 
   <article class="webrtc-slide">
     <h3>Build the future...</h3>
@@ -1097,7 +1065,6 @@ function playSound(arrayBuffer) { // Obtain arrayBuffer from XHR2.
   })();
   </script>
 
-<!--
   <article class="smaller">
     <h3>Generating sound</h3>
     <aside class="note">
@@ -1118,7 +1085,6 @@ src.noteOn(0);
 </pre>
     <iframe style="border:none;width:800px;height:250px;" src="http://www.htmlfivewow.com/demos/waveform-generator/index.html"></iframe>
   </article>
--->
 
   <article class="smaller">
     <h3>Audio processing</h3>

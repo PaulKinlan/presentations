@@ -15,7 +15,7 @@ window.slidesConfig = window.slidesConfig || {
     blog: 'http://paul.kinlan.me/',
 
     // GDD info
-    location: 'Prague',
+    location: 'Antwerp',
     date: new Date(),
     logo: 'images/chrome_logo.png'
   }

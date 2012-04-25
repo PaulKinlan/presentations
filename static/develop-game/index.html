@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<!--
+Copyright 2011 Google Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Author: Eric Bidelman (ericbidelman@chromium.org)
+-->
+<html>
+<head>
+  <title>Develop - Liverpool</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|Droid+Sans+Mono&v2">
+  <link rel="icon" type="image/png" href="images/chrome-logo-tiny2.png">
+  <style>
+    .darker {
+      color: white;
+      background-color: rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body style="display: none">
+
+<section class="slides layout-regular">
+
+  <!--<article class='biglogo'></article>-->
+  <article id="title-slide">
+    <div>
+      <div data-config-logo></div>
+      <h1>Games!!1!</h1>
+      <p data-config-name></p>
+      <p class="info">
+        <time datetime="YYYY-MM-DD" data-config-date>MM DD, 2011</time> &nbsp; - &nbsp; <span data-config-location></span>
+      </p>
+      <img data-config-map class="rounded" title="Of course we're using Geolocation!" alt="Of course we're using Geolocation!">
+    </div>
+  </article>
+
+  <article id="who">
+    <h3>Who?</h3>
+    <p>
+      <img class="avatar rounded" data-config-pic>
+    </p>
+    <p>
+      <a rel="author" data-config-gplus target="_blank">
+        <img src="http://www.google.com/images/icons/ui/gprofile_button-44.png" width="44" height="44">
+      </a> +<a rel="author" data-config-gplus target="_blank"><span data-config-name></span></a>
+    </p>
+    <br>
+    <p>
+      <a rel="author" data-config-twitter target="_blank" style="margin-left:-8px;">
+        <img src="images/twitter_newbird_blue.png" width="58" height="58">
+      </a> @ <a rel="author" data-config-twitter target="_blank" style="margin-left:-8px;"><span data-config-twitter></span></a>
+    </p>
+    <br>
+    <p>
+      Blog: <a data-config-blog target="_blank"><span data-config-blog></span></a>
+    </p>
+  </article>
+
+  <article>
+    <h2 class="darker">Covering</h2>
+    <ul>
+      <li>Chrome and the Web as a gaming platform</li>
+      <li>Using Chrome Web Store to distribute your game</li>
+    </ul>
+  </article>
+  
+  <article>
+    <h2 class="darker">Why is the web THE platform?</h2>
+  </article>
+
+  <article>
+    <h2 class="darker">Chrome</h2>
+    <section class="flexcenter">
+      <div id="chrome-logo">
+        <div id="colors">
+        <div id="white_shell">
+          <div id="green" class="leaf"></div>
+          <div id="yellow" class="leaf"></div>
+          <div id="yellow2" class="leaf"></div>
+          <div id="red" class="leaf"></div>
+          <div id="blue_core"></div>
+        </div>
+        </div>
+      </div>
+    </section>
+  </article>
+ 
+  <article class="fill">
+    <h2 class="darker">200+ Million users</h2>
+    <img src="images/chrome-users.png">
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">+ Firefox users</h2>
+    <img src="images/ff.png">
+    <div class="source" style="color: white;">Source: http://www.wikipedia.org/</div>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">+ IE users</h2>
+    <img src="images/ie.png">
+    <div class="source" style="color: white;">Source: http://www.wikipedia.org/</div>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">That's over a billion users</h2>
+  </article>
+   
+   <!-- 683957630
+   mqshae7h-->
+  
+  <article class="fill">
+    <h2 class="darker">Not including all the mobile users</h2>
+    <img src="images/formfactor.jpg">
+    <div class="source" style="color: white;">Source: http://www.flickr.com/photos/marcfonteijn/4655088409/</div>
+  </article>
+  
+  <article>
+    <h2 class="darker">Distribution is simple</h2>
+    <p style="font-size: 3em; line-height:1;">Its just http://a.url.com/</p>
+  </article>
+  
+  <article>
+     <h2 class="darker">You can put it in stores</h2>
+     <img src="images/chrome-web-store.png" />
+  </article>
+  
+  <article>
+    <h2 class="darker">People can distribute it</h2>
+  </article>
+  
+  <article class="fill">
+    <h2 style="color:white;">Getting discovered is hard</h2>
+    <img src="images/frustrateduser.jpg">
+  </article>
+
+  <article>
+    <h2 class="darker">The Web platform: The Technologies</h2>
+    <ul>
+      <li>Graphics</li>
+      <li>Audio</li>
+      <li>Sensory Data</li>
+      <li>Adaptive Display</li>
+      <li>Camera and Microphones</li>
+    </ul>
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">Graphics</h2>
+    <img src="images/capabilities.jpg" />
+  </article>
+  
+  <article class="fill">
+    <a href="http://chrome.angrybirds.com/" target="_blank">Obvious Demo</a>
+  </article>
+  
+  <article>
+    <h2 class="darker">Graphics: WebGL</h2>
+    <p>It's OpenGL ES 2.0 but in Javascript</p>
+    <img src="images/WebGL_500.png">
+  </article>
+  
+  <article class="fill">
+    <a href="http://alteredqualia.com/three/examples/webgl_terrain_dynamic.html" target="_blank">Awesome Demo!!1!</a>
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">Advanced Audio</h2>
+    <img src="images/capabilities.jpg" />
+  </article>
+  
+  <article class="fill">
+    <iframe src="http://www.htmlfivewow.com/demos/hal/index.html"></iframe>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">Even more awesomeness</h2>
+    <img src="images/capabilities.jpg" />
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">Offline Enabled</h2>
+    <ul>
+      <li>Downloads core assets</li>
+      <li>Keeps them available even when not online</li>
+    </ul>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">FileSystem API</h2>
+    <ul>
+      <li>Store files directly in the browser</li>
+      <li>Common file operations</li>
+    </ul>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">Game Pad Access* + Pointer Lock</h2>
+    <ul>
+      <li>Detect when a pad is connected or removed</li>
+      <li>Interact with the game using normal events</li>
+    </ul>
+    <p>*This might change</p>
+    <pre>function gamepadConnected(e) {
+  gamepadId = e.gamepad.id;
+  console.log("Gamepad Connected (id=" + gamepadId + ")");
+}
+
+window.addEventListener("GamepadConnected", gamepadConnected, false);
+window.addEventListener("GamepadButtonDown", ... , false);</pre>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">Sensor Access</h2>
+    <iframe src="http://itsaballthatrolls.appspot.com/"></iframe>
+  </article>
+  
+  <article id="fullscreen-slide">
+    <h3>Fullscreen content</h3>
+    <pre class="centered">
+&lt;video width="300" src="movie.webm" controls&gt;&lt;/video&gt;
+&lt;button onclick="enterFullscreen()">Get Huge!&lt;/button&gt;
+</pre>
+  <pre>
+function enterFullscreen() {
+  var elem = document.querySelector('body');
+  elem.onwebkitfullscreenchange = function(e) {
+    console.log("Entered fullscreen!");
+    elem.onwebkitfullscreenchange = onFullscreenExit;
+  };
+  elem.<b>webkitRequestFullScreen</b>();
+}
+</pre>
+    <p class="centered" style="margin-top:2em;"><a href="demos/fullscreen.html" class="demo" target="_blank">Demo</a></p>
+  </article>
+
+  <article class="smaller">
+    <h3>Camera &amp; microphone access</h3>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>Prefixed as <code>navigator.webkitGetUserMedia()</code> in WebKit</li>
+          <li><code>window.URL.createObjectURL()</code> is prefixed as <code>window.webkitURL.createObjectURL()</code> in WebKit</li>
+          <li>Needs <code>--enable-media-stream</code> flag in Chrome.</li>
+          <li><a href="http://developers.whatwg.org/dnd.html#video-conferencing-and-peer-to-peer-communication" target="_blank">Video conferencing and peer-to-peer spec</a></li>
+        </ul>
+      </section>
+    </aside>
+    <p>Plugin-free camera, microphone, device access.</p>
+    <pre>
+&lt;video autoplay controls&gt;&lt;/video&gt;
+&lt;input type="button" value="⚫" onclick="record(this)" id="start">
+&lt;input type="button" value="◼" onclick="stop(this)" id="stop" disabled>
+</pre>
+    <pre>
+var localMediaStream, recorder;
+
+var record = function(button) {
+  recorder = mediaStream.recorder();
+};
+
+var stop = function(button) {
+  mediaStream.stop();
+  recorder.getRecordedData(function(blob) {
+    // Upload blob using XHR2.
+  });
+};
+
+<b>window.navigator.getUserMedia</b>('video', function(stream) {
+  document.querySelector('video').src = <b>window.URL.createObjectURL(stream)</b>;
+  localMediaStream = stream;
+});</pre>
+  </article>
+  
+  <article class="webrtc-slide">
+    <h3>WebRTC</h3>
+    <p class="centered"><em><label class="underline">Plugin-free</label> high quality real-time voice/video communication in the browser</em></p>
+    <br>
+    <ul class="fade">
+      <li>Browser engine:
+        <ul>
+          <li>Echo cancellation, noise reduction, automatic gain control</li>
+          <li>Network jitter management</li>
+        </ul>
+      </li>
+      <li>Web APIs:
+        <ul>
+          <li>Audio/video capture and playback</li>
+          <li>Device management</li>
+        </ul>
+      </li>
+    </ul>
+  </article>
+  
+  <article>
+    <h2 class="darker">Going Native! with Native Client</h2>
+    <p>Use a lot of your existing C++ code</p>
+    <p>More info: http://www.gonacl.com</p>
+  </article>
+  
+  <article>
+    <h2 class="darker">HTML!!!</h2>
+    <h3>It Rocks for:</h3>
+    <ul>
+      <li>Layout</li>
+      <li>Menus</li>
+      <li>Purchase screens</li>
+    </ul>
+    <p>Canvas for graphics</p>
+  </article>
+  
+  <article>
+    <h1>The web is a great platform for games</h1>
+  </article>
+  
+  <article>
+    <h2 class="darker">You've built a game. Now what?</h2>
+  </article>
+  
+  <article>
+    <h2 class="darker">Chrome Web Store?</h2>
+    <img src="images/chrome-web-store.png" />
+  </article>
+  
+  <article>
+    <h2 class="darker">Why?</h2>
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">200+ Million users</h2>
+    <img src="images/chrome-users.png">
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">A direct channel built into Chrome</h2>
+    <img src="images/channel.png">
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">We can get you distribution</h2>
+    <img src="images/cws-games.png" />
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">You have your own space</h2>
+    <img src="images/place.png">
+  </article>
+  
+  <article class="fill">
+    <h2 class="darker">With reviews</h2>
+    <img src="images/reviews.png">
+  </article>
+  
+  <article>
+    <h2 class="darker">How?</h2>
+  </article>
+  
+  <article class="fill">
+    <h2 style="color: white; background-color: rgba(0,0,0,0.8);">It's easy to get in.</h2>
+    <h3>1. Create the package</h3>
+    <iframe src="http://appmator.appspot.com/"></iframe>
+  </article>
+  
+  <article class="fill">
+    <h3>2. Upload</h3>
+    <a href="https://chrome.google.com/webstore/developer/dashboard">Upload</a>
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">Show me the money!</h2>
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">Paying it forward</h2>
+    <ul>
+      <li>Up front
+        <ul>
+      <li>Single Item</li>
+      <li>Trial</li>
+      </ul></li>
+      <li>Subscriptions:<ul>
+        <li>Monthly</li>
+        <li>Annual</li>
+      </ul></li>
+    </ul>
+    <img src="images/try.png">
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">Or get them through the door</h2>
+    <p style="font-size: 10em; text-shadow: 0 0 5px red; color: red; font-weight: bold; text-align: center; margin-top: 0.5em;">5%</p>
+    <img src="images/payments.png">
+  </article>
+
+  <article>
+    <h2 class="darker">I only have iOS games!</h2>
+    <p>That is ok!, we can take them too?</p>
+  </article>
+  
+  <article>
+    <h2 class="darker">Wait? What! How?  A: LLVM</h2>
+    <ul>
+      <li><a href="https://github.com/kripken/emscripten">Emscripten - https://github.com/kripken/emscripten</a></li>
+      <li><a href="http://www.mandreel.com">Mandreel - http://www.mandreel.com</a></li>
+    </ul>
+  </article>
+  
+  <article>
+    <h2 class="darker">I only have Android games!</h2>
+    <p>That is ok!, we can take them too?</p>
+  </article>
+  
+  <article>
+    <h2 class="darker">Wait? What! How?  A: PlayN</h2>
+    <ul>
+      <li>One build, taken to Android and the Web, or Flash and more</li>
+      <li><a href="https://developers.google.com/playn/">https://developers.google.com/playn/</a></li>
+    </ul>
+  </article>
+
+  <article>
+    <p>I am here to:</p>
+    <ul>
+      <li>Help you launch great games on the web</li>
+      <li>Help you make $$$ using IAP and Chrome Web Store</li>
+    </ul>
+  </article>
+
+  <article class="fill">
+    <h2 class="darker">I need your help: http://bitly.com/develop-liverpool</h2>
+    <iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dDRjX0kzcGJkZGtMT3I2TWF3UjhVVGc6MQ" >Loading...</iframe>
+  </article>
+
+  <article class="fill">
+    <section class="flexcenter">
+      <div id="chrome-logo">
+        <div id="colors">
+        <div id="white_shell">
+          <div id="green" class="leaf"></div>
+          <div id="yellow" class="leaf"></div>
+          <div id="yellow2" class="leaf"></div>
+          <div id="red" class="leaf"></div>
+          <div id="blue_core"></div>
+        </div>
+        </div>
+      </div>
+      <h2>Thanks</h2>
+    </section>
+  </article>
+
+</section>
+
+<script src="js/config.js"></script>
+<script src="js/hide-slides.js"></script>
+<script src="js/slides.js"></script>
+<script>
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25678279-1']);
+  _gaq.push(['_setDomainName', '.bleedinghtml5.appspot.com']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!--[if IE]>
+<script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+<script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+
+</body>
+</html>

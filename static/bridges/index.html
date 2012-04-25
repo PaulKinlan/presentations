@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<!--
+  Google I/O 2011 HTML slides template
+  
+  Created by Luke Mahé (lukem@google.com) 
+  and Marcin Wichary (mwichary@google.com).
+
+  Web Intents presentation by Paul Kinlan
+-->
+
+<html>
+  <head>
+    <title>On building bridges.</title>
+    <meta charset='utf-8' />
+    <script
+      src='slides.js'></script>
+    <script src="http://webintents.org/webintents.js"></script>
+  </head>
+  
+  <style>
+    li.tick:after {
+      content:url(images/tick.png);
+      padding-left: 5px;
+      width: 3em;
+      height: 3em;
+    }
+
+    pre strong {
+      background-color: yellow;
+      padding: 5px;
+    }
+    
+    .slides > article::before {
+      font-size: 18px;
+      display: block;
+      position: absolute;
+      left: 15px;
+      bottom: 15px;
+    }
+    
+   .fill h4 {
+     display: inline;
+     position: absolute;
+     bottom: 50px;
+     padding: 15px; 
+     font-size: 2em;
+     line-height: 1em;
+   }
+
+   .dark {
+     background-color: rgba(0,0,0, 0.8);
+     color: white;
+   } 
+  </style>
+
+  <body style='display: none'>
+
+    <section class='slides'>
+      
+      <!-- Your slides (<article>s) go here. Delete or comment out the
+           slides below. -->
+           
+      <div id="plusone"></div>
+      
+      <article>
+        <h1>
+        </h1>
+        <p>
+          Paul Kinlan (@<a href="http://twitter.com/Paul_Kinlan">paul_kinlan</a>)<br/>
+          G+: <a href="http://plus.ly/paul.kinlan">plus.ly/paul.kinlan</a>
+        </p>
+      </article>
+
+      <article>
+        <h2>The web is changing at a pace never been seen before</h2>
+      </article>
+
+      <article>
+        <h2>I could talk about all of the awesome stuff we are doing in Chrome and WebKit.</h2>
+      </article>
+
+      <article>
+        <h2>CSS Regions and exclusions</h2>
+      </article>
+
+      <style>
+        @-webkit-keyframes blur {
+          0% {
+            -webkit-filter: blur(5px);
+          }
+          100% {
+            -webkit-filter: blur(0px);
+          }
+        }   
+   
+        #filters {
+          -webkit-filter: blur(5px);
+          filter: blur(5px);
+          -webkit-animation-name: blur;
+          -webkit-animation-duration: 1s;
+          -webkit-animation-direction: alternate;
+          -webkit-animation-iteration-count: infinite;
+        }
+      </style>
+
+      <article class="fill" id="filters">
+        <h4 class="dark">CSS Filters</h4>
+        <img src="images/danger.jpg" />
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">NaCL</h4>
+        <img src="images/jack.jpg" />
+      </article>
+
+      <article>
+        <h2>WebGL</h2>
+      </article>
+
+      <article>
+        <h2>Dart</h2>
+      </article>
+
+      <article>
+        <h2>V8</h2>
+      </article>
+
+      <article>
+        <h2>Extensions</h2>
+      </article>
+
+      <article>
+        <h1>But I won't</h1>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">I am going to talk about Tunnels and Bridges</h4>
+        <img src="images/bridge1.jpg" />
+        <div class="source">http://www.flickr.com/photos/31505964@N08/3089245263/sizes/l/in/photostream/</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">6BC</h4>
+        <img src="images/Eupalinian_aqueduct.JPG" />
+        <div class="source">http://en.wikipedia.org/wiki/Tunnel_of_Eupalinos</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Bespoke</h4>
+        <img src="images/digger.jpg" />
+        <div class="source">http://www.worldtravelattractions.com/the-channel-tunnel-%E2%80%93-the-undersea-connection-between-britain-and-france/</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Lots of Engineering and Luck</h4>
+        <img src="images/breakthrough.jpg" />
+        <div class="source">http://www.tunneltalk.com/Channel-Tunnel-Dec10-20-years-on.php</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark" style="top:10px; bottom:inherit;">It's a lot like apps today</h4>
+        <img src="images/bridgestunnel.png" style="width:50%;" />
+        <div class="source">Me :(</div>
+        </article>
+
+      <article class="fill">
+        <h4 class="dark">Why are bridges better?</h4>
+        <img src="images/bridge1.jpg" />
+        <div class="source">http://www.flickr.com/photos/31505964@N08/3089245263/sizes/l/in/photostream/</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Common patterns</h4>
+        <img src="images/wearmouth.jpg" />
+        <div class="source">http://en.wikipedia.org/wiki/File:Wearmouth_bridge.jpg</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Common patterns</h4>
+        <img src="images/tyne.jpg" />
+        <div class="source">http://en.wikipedia.org/wiki/File:Tyne_Bridge_-_Newcastle_Upon_Tyne_-_England_-_2004-08-14.jpg</div>
+      </article>
+
+
+      <article class="fill">
+        <h4 class="dark">Easier to build and maintain</h4>
+        <img src="images/062909-Bridge-full.jpg" style="width: 50%" />
+        <div class="source">http://www.ng.mil/news/archives/2009/06/062909-Bridge.aspx</div>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">A lot like web intents</h4>
+        <img src="images/bridgestunnel1.jpg" style="width: 50%;" />
+        <div class="source">http://www.flickr.com/photos/31505964@N08/3089245263/sizes/l/in/photostream/</div>
+      </article>
+      <article class="fill">
+        <h4 class="dark">I am going to talk about Tunnels and Bridges</h4>
+        <img src="images/bridge1.jpg" />
+        <div class="source">http://www.flickr.com/photos/31505964@N08/3089245263/sizes/l/in/photostream/</div>
+      </article>
+      <article class="fill">
+        <h4 class="dark">
+         What's the problem?
+        </h4>
+      </article>
+
+      <article class="fill">
+        <img src="images/problem1.jpg">
+      </article>
+      
+      <article class="fill" >
+      <img src="images/problem2.jpg" style="min-height:0;">
+      </article>
+      
+      <article class="fill">
+        <img src="images/problem3.jpg">
+      </article>
+      
+      <article class="fill">
+        <h4 class="dark">Sharing</h4>
+        <img src="images/sharing.png" />
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Pick</h4>
+        <img src="images/picking.png" />
+      </article>
+
+      <article class="fill">
+        <img src="images/edit.jpg" /> 
+        <h4 class="dark">Editing</h4>
+      </article>
+
+      <article class="fill">
+        <img src="images/save.jpg" /> 
+        <h4 class="dark">Saving</h4>
+      </article>
+
+      <article class="fill">
+        <h4 class="dark">Authentication</h4>
+        <img src="images/openid.jpg" />
+        <div class="source">http://www.flickr.com/photos/sermoa/2453162128/</div>
+      </article>
+
+      <article class="fill">
+      <img src="images/services.jpg">
+      <h4 class="dark">Imagine integrating all these services?!?!1!</h4>
+      </article>
+
+      <article class="fill">
+        <img src="images/saddeveloper.jpg">
+      </article>
+
+      <article>
+        <h2>There is a solution in the works</h2>
+      </article>
+
+      <article>
+        <q>Web Intents is a framework for client-side service discovery and inter-application communication</q>
+      </article>
+
+      <article>
+        <h2>It's like an Android Intent</h2>
+      </article>
+
+      <article>
+        <pre>var intent = new Intent("http://webintents.org/share", 
+                        "text/uri-list", 
+                        window.location.href);
+window.navigator.startActivity(intent);</pre>
+      <h2>Client App: I need a sharing service</h2>
+      <button id="share">Share</button>
+      </article>
+<script>
+ var share = document.getElementById("share");
+ share.addEventListener("click", function() {
+   var intent = new Intent("http://webintents.org/share", 
+     "text/uri-list",
+     window.location.href);
+   window.navigator.startActivity(intent); 
+ });
+</script>
+      
+      <article>
+      <h3>Action</h3>
+
+    <pre>var intent = new Intent(<strong>"http://webintents.org/share"</strong>, 
+                        "text/uri-list", 
+                        window.location.href);
+window.navigator.startActivity(intent);</pre>
+      <p>A verb.</p>
+      <ul>
+        <li><a href="http://webintents.org/share" target="_blank">http://webintents.org/share</a></li>
+        <li><a href="http://webintents.org/edit" target="_blank">http://webintents.org/edit</a></li>
+        <li><a href="http://webintents.org/pick" target="_blank">http://webintents.org/pick</a></li>
+        <li><a href="http://webintents.org/save" target="_blank">http://webintents.org/save</a></li>
+        <li>+ many more</li>
+      </ul>
+      </article>
+
+      <article>
+        <h3>Type</h3>
+        <pre>var intent = new Intent("http://webintents.org/share", 
+                        <strong>"text/uri-list"</strong>, 
+                        window.location.href);
+window.navigator.startActivity(intent);</pre>
+      <p>A description of the data being used</p>
+        <ul>
+          <li>Mime-types</li>
+          <li>Activity Streams</li>
+        </ul>
+      </article>
+ 
+      <article>
+        <h3>Data</h3>
+        <pre>var intent = new Intent("http://webintents.org/share", 
+                        "text/uri-list", 
+                        <strong>window.location.href</strong>);
+window.navigator.startActivity(intent);</pre>
+        <p>The data by value or reference (URL)</p>
+        <p>Can be complex types such as images, audio or documents</p>
+      </article>
+      
+      <article>
+        <pre>&lt;intent
+   action="http://webintents.org/share"
+   type="image/*"
+   href="shareimage.html" &gt;</pre>
+        <p>When launched, data on:</p>
+        <pre>window.intent</pre>
+        <h2>Service: I can provide this service</h2>
+        </article>
+
+      <article>
+      <h3>And then what?</h3>
+      <div class="build">
+        <h2>Nothing - you have just integrated your apps and services</h2>
+      </div>
+      </article>
+     
+      <article class="fill">
+      <h4 class="dark">Let's go Deeper</h4>
+      <img src="images/inception.png">
+      </article> 
+ 
+      <article>
+        <h3>We can do two-way communication</h3>
+        <p>Client: </p><pre>var intent = new Intent("http://webintents.org/pick", "image/*");
+window.navigator.startActivity(intent, <b>function(intentData) {
+  // Do something with the response
+}</b>);</pre>
+        <p>Service: </p>
+        <pre>window.intent.postResponse({  ... some data ...  });</pre>
+      </article>
+
+      <article class="fill">
+        <h3>Demo - cloud file picker</h3>
+        <pre>var intent = new Intent("http://webintents.org/pick", "image/*");
+window.navigator.startActivity(intent, function(intentData) {
+  var pickedImage = document.getElementById("picked");
+  pickedImage.src = intentData.data;
+});</pre>
+        <button id="pick">Pick an Image</button> 
+        <img id="picked" />
+       </article>
+<script>
+ var pick = document.getElementById("pick");
+ pick.addEventListener("click", function() {
+   var intent = new Intent("http://webintents.org/pick", 
+                           "image/*");
+   window.navigator.startActivity(intent, function(intentData) {
+     var pickedImage = document.getElementById("picked");
+     pickedImage.src = intentData.data;
+   });
+ });
+
+</script>
+      <article>
+        <h3>We can do long-lived connections*</h3>
+        <p>* - next version of the shim</p>
+        <p>Client: </p><pre>var channel = MessageChannel();
+var intent = new Intent("http://webintents.org/pick", 
+    "image/*",
+    <b>channel.port1</b>);
+window.navigator.startActivity(intent);</pre>
+      </article>
+      
+      <article>
+        <h2>Demo</h2>
+        <a href="http://demos.webintents.com/" target="_blank">PAUL CLICK THIS!!</a>
+      </article>
+
+      <article>
+        <h3>Closing thoughts</h3>
+        <q>This will change the way we build apps on the web - Paul Kinlan</q>
+      </article>
+
+      <article>
+        <h3>More Information</h3> 
+        <ul>
+          <li>Try it today: <a href="http://webintents.org/">webintents.org</a></li>
+          <li>Code: <a href="http://github.com/PaulKinlan/WebIntents">github.com/PaulKinlan/WebIntents</a></li>
+          <li>Forum: <a href="http://groups.google.com/group/web-intents">groups.google.com/group/web-intents</a></li>
+          <li>Me: @Paul_Kinlan or plus.ly/paul.kinlan</li>
+        </ul>
+      </article>
+       
+      <article>
+        <h3>
+          Thank you!
+        </h3>
+        <h2>What are your use-cases?</h2>
+      </article>
+      
+    </section>
+  </body>
+</html>
